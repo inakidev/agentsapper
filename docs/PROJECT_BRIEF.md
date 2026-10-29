@@ -1,5 +1,7 @@
 # agentsapper — Project Brief
 
+> **Desvíos respecto del plan:** este brief es el plan original y no se reescribió. Los cambios que se hicieron durante la implementación (catálogo, severidades y proceso) y sus motivos están en [DEVIATIONS.md](DEVIATIONS.md).
+
 > **Sobre el nombre:** un *sapper* (zapador) es el ingeniero militar que limpia el camino de minas antes de que avance la tropa. `agentsapper` limpia el repo antes de que entre el agente. Al 28/10/2026 el nombre estaba libre en npm y sin repos homónimos en GitHub. Conviene reservarlo pronto: crear el repo y publicar en npm una versión `0.0.1` placeholder.
 
 ## 1. Qué es
