@@ -23,9 +23,24 @@ const INLINE_CODE_FLAG: Readonly<Record<string, RegExp>> = {
   ruby: /^-[a-zA-Z]*e/,
 };
 
-/** Inline code that runs what it reads: exec(sys.stdin.read()), eval(...), new Function(...). */
-const EXECUTES_INPUT =
-  /\b(exec|eval|execfile|compile|runpy|Function|system|popen|spawn|execSync|instance_eval)\s*\(|\bvm\.run|\bsubprocess\b|\bchild_process\b|\beval\b/;
+/**
+ * Inline code that may run what it reads, such as exec(sys.stdin.read()). This is a
+ * blocklist, and obfuscated code gets past it, which is why plain data pipes are
+ * still reported (at low) instead of dropped.
+ */
+const EXECUTES_INPUT: readonly RegExp[] = [
+  // Calls that run code or commands: exec, execfile, execSync, os.system, os.popen, ...
+  /\b(exec\w*|eval|compile|_compile|system|popen\w*|spawn\w*|run\w*Context|instance_eval|Function|Script|getattr)\s*\(/,
+  // Modules and builtins that run, deserialize or dynamically load code.
+  /\b(subprocess|child_process|runpy|importlib|pickle|cPickle|marshal|dill|ctypes|builtins|__builtins__|__import__)\b/,
+  // eval without parentheses (Perl, shell), Perl qx and Ruby %x.
+  /\beval\b|\bqx\b|%x\W/,
+];
+
+const SHELLS = /^(sh|bash|zsh|dash|ksh)$/;
+/** Shell code that runs its input, or hands it to another interpreter. */
+const SHELL_RUNS_INPUT =
+  /\/dev\/stdin|\$\(\s*cat\b|`\s*cat\b|\b(source|xargs|sh|bash|zsh|dash|ksh|python3?|node|perl|ruby)\b/;
 
 export type DownloadPipe =
   /** The interpreter runs the download as its program: `| sh`, `| python3 -`, `| bash -s`. */
@@ -49,8 +64,13 @@ export function classifyDownloadPipe(row: string): DownloadPipe | undefined {
   const command = (match[2] ?? '').split(/[|;&)`]/)[0]?.trim() ?? '';
   for (const arg of command.split(/\s+/)) {
     if (arg === '' || arg === '-' || arg === '--' || arg.startsWith('-s')) return 'program';
-    if (inline?.test(arg) === true)
-      return EXECUTES_INPUT.test(match[2] ?? '') ? 'inline-exec' : 'data';
+    if (inline?.test(arg) === true) {
+      const code = match[2] ?? '';
+      const runs =
+        EXECUTES_INPUT.some((re) => re.test(code)) ||
+        (SHELLS.test(interpreter) && SHELL_RUNS_INPUT.test(code));
+      return runs ? 'inline-exec' : 'data';
+    }
     if (arg.startsWith('-')) continue; // other interpreter flags
     return /^[\w./~$]/.test(arg) ? 'data' : 'program'; // a script path reads the download as input
   }
