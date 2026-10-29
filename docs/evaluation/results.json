@@ -3,9 +3,9 @@
   "fixtures": {
     "perRule": {
       "GIT-001": {
-        "expected": 5,
-        "detected": 5,
-        "exactSeverity": 5,
+        "expected": 6,
+        "detected": 6,
+        "exactSeverity": 6,
         "unexpected": 0
       },
       "GIT-002": {
@@ -63,15 +63,15 @@
         "unexpected": 0
       },
       "FS-003": {
-        "expected": 7,
-        "detected": 7,
-        "exactSeverity": 7,
+        "expected": 8,
+        "detected": 8,
+        "exactSeverity": 8,
         "unexpected": 0
       },
       "AGENT-001": {
-        "expected": 14,
-        "detected": 14,
-        "exactSeverity": 14,
+        "expected": 17,
+        "detected": 17,
+        "exactSeverity": 17,
         "unexpected": 0
       },
       "AGENT-002": {
@@ -491,12 +491,39 @@
         "detected": 1,
         "unexpected": [],
         "incomplete": []
+      },
+      {
+        "id": "case-respelled-config",
+        "kind": "malicious",
+        "source": "https://labs.cloudsecurityalliance.org/research/csa-research-note-ai-coding-agent-git-config-rce-20260904-cs/",
+        "expected": 2,
+        "detected": 2,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "case-respelled-link",
+        "kind": "malicious",
+        "source": "https://code.claude.com/docs/en/hooks",
+        "expected": 2,
+        "detected": 2,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "case-colliding-config",
+        "kind": "malicious",
+        "source": "https://code.claude.com/docs/en/hooks",
+        "expected": 1,
+        "detected": 1,
+        "unexpected": [],
+        "incomplete": []
       }
     ],
     "skipped": 2
   },
   "benign": {
-    "fetchedAt": "2026-10-29T21:17:46.181Z",
+    "fetchedAt": "2026-10-29T21:41:10.441Z",
     "platform": "linux",
     "repos": [
       {
@@ -524,7 +551,7 @@
         "why": "classic Node project",
         "commit": "1c6f1b0fe4000977b9a7b4f34097e4d527dd9824",
         "checkout": "complete",
-        "ms": 15,
+        "ms": 14,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -543,7 +570,7 @@
         "why": "husky hooks, lifecycle scripts",
         "commit": "9d11464a75ee5c644c0308d742f58755c0482594",
         "checkout": "complete",
-        "ms": 43,
+        "ms": 36,
         "bySeverity": {
           "info": 2,
           "low": 0,
@@ -581,7 +608,7 @@
         "why": "large Node project with tooling config",
         "commit": "97431f86d5dc7cd60ade6415393b906cf08fe46c",
         "checkout": "complete",
-        "ms": 69,
+        "ms": 71,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -600,7 +627,7 @@
         "why": "VS Code config, lifecycle scripts",
         "commit": "c7a823c43bd050b6d7855d50814517d0e65b23af",
         "checkout": "complete",
-        "ms": 365,
+        "ms": 373,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -619,7 +646,7 @@
         "why": "pnpm monorepo, VS Code config",
         "commit": "cce559ab158cc6b177d0911a0bea73436b48faff",
         "checkout": "complete",
-        "ms": 133,
+        "ms": 128,
         "bySeverity": {
           "info": 2,
           "low": 0,
@@ -651,7 +678,7 @@
         "why": "small Node library",
         "commit": "247faa0ff0641020e8790475989cee72df85d62b",
         "checkout": "complete",
-        "ms": 15,
+        "ms": 14,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -670,7 +697,7 @@
         "why": "many devcontainer.json files with lifecycle commands",
         "commit": "4e753eab1195ea28a325fde4bee60bd9fadc9d3e",
         "checkout": "complete",
-        "ms": 17,
+        "ms": 22,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -696,7 +723,7 @@
         "why": "dev container and Claude Code project config",
         "commit": "58d6da1e34d6cd1c6379dcbf568bd66f5f9b6102",
         "checkout": "complete",
-        "ms": 53,
+        "ms": 60,
         "bySeverity": {
           "info": 0,
           "low": 2,
@@ -734,7 +761,7 @@
         "why": "GEMINI.md and .gemini config",
         "commit": "4a8383b9db43aed3f1a1acef0b5114d810722195",
         "checkout": "complete",
-        "ms": 79,
+        "ms": 73,
         "bySeverity": {
           "info": 3,
           "low": 0,
@@ -802,7 +829,7 @@
         "why": "AGENTS.md and agent tooling",
         "commit": "297f5e33a5f917863a7b83f262c9ef1431bc0267",
         "checkout": "complete",
-        "ms": 230,
+        "ms": 183,
         "bySeverity": {
           "info": 1,
           "low": 3,
@@ -846,7 +873,7 @@
         "why": "MCP servers, npx-based configs in docs",
         "commit": "194cc86e3ae6400958555bd4116849d822d69263",
         "checkout": "complete",
-        "ms": 34,
+        "ms": 38,
         "bySeverity": {
           "info": 4,
           "low": 0,
@@ -896,7 +923,7 @@
         "why": "agent rules files, VS Code extension config",
         "commit": "b194fe9faf15cf1d73e1506b2c9c783aa307d9c6",
         "checkout": "complete",
-        "ms": 140,
+        "ms": 121,
         "bySeverity": {
           "info": 1,
           "low": 1,
@@ -1007,7 +1034,7 @@
         "why": "Python project with dev tooling",
         "commit": "d086db856be187255b8ec61ef409357393020f32",
         "checkout": "complete",
-        "ms": 7,
+        "ms": 6,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -1033,7 +1060,7 @@
         "why": "Python project with pre-commit and CI config",
         "commit": "dd0c36a4be235522e34659ba372c59b43b55f33e",
         "checkout": "complete",
-        "ms": 16,
+        "ms": 13,
         "bySeverity": {
           "info": 0,
           "low": 0,

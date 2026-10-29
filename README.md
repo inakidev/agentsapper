@@ -170,11 +170,13 @@ exact names could not be verified verbatim in official docs.
 Full tables: [docs/evaluation/RESULTS.md](docs/evaluation/RESULTS.md). Reproduce them with
 `npm run corpus:fetch && npm run eval`, or with the Evaluation workflow on Linux.
 
-**Fixture corpus.** 34 malicious fixtures (each reproducing a published technique or a known
+**Fixture corpus.** 37 malicious fixtures (each reproducing a published technique or a known
 evasion, with a link to its source) and 8 benign false-positive traps. Two are Windows-only
 (directory junctions, and the Win32 treatment of `..` in link targets) and run in the Windows CI
-jobs; one is POSIX-only. On Linux, all 110 expected findings of the other 32 malicious fixtures
-are detected with the expected file, line and severity, with no unexpected findings. These
+jobs; one is POSIX-only, and one Linux-only (two names that differ only in case). On Linux, all
+115 expected findings of the other 35 malicious fixtures are detected with the expected file,
+line and severity, with no unexpected findings. In CI every fixture also runs a second time with
+its paths in upper case, on Linux and Windows, and must produce the same findings. These
 fixtures were written alongside the rules, so treat this as a regression suite rather than an
 independent measure of detection.
 
