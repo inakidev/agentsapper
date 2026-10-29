@@ -28,8 +28,12 @@ export interface ParsedConfig {
   readonly errors: readonly ConfigError[];
 }
 
-/** The key as git spells it: `section.subsection.name`, or `section.name`. */
+/**
+ * The key as git spells it: `section.subsection.name`, `section.name`, or just
+ * `name` for a variable written before any section header (git accepts those).
+ */
 export function configKey(entry: Pick<ConfigEntry, 'section' | 'subsection' | 'name'>): string {
+  if (entry.section === '') return entry.name;
   const sub = entry.subsection === undefined ? '' : `.${entry.subsection}`;
   return `${entry.section}${sub}.${entry.name}`;
 }
@@ -84,7 +88,9 @@ export function parseGitConfig(text: string): ParsedConfig {
   const reader = new Reader(text.startsWith('\u{feff}') ? text.slice(1) : text);
   const entries: ConfigEntry[] = [];
   const errors: ConfigError[] = [];
-  let section: { section: string; subsection?: string } | undefined;
+  // Variables before the first header have an empty section, as in git (config.c
+  // starts with an empty base name). No executable key lives there.
+  let section: { section: string; subsection?: string } = { section: '' };
   let comment = false;
 
   for (;;) {
@@ -103,12 +109,11 @@ export function parseGitConfig(text: string): ParsedConfig {
 
     try {
       if (c === '[') {
-        section = undefined;
+        // git aborts on a bad header; we keep going, without a section.
+        section = { section: '' };
         section = parseHeader(reader);
       } else if (!isAlpha(c)) {
         throw new ParseError(`unexpected character ${JSON.stringify(c)}`);
-      } else if (section === undefined) {
-        throw new ParseError('variable outside of any section');
       } else {
         const { name, value } = parseVariable(reader, c);
         entries.push({ ...section, name, value, line });

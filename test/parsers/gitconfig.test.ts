@@ -87,6 +87,17 @@ describe('parseGitConfig', () => {
     expect(entries('\u{feff}[core]\r\n\tx = 1\r\n\ty = 2')).toEqual(['core.x=1@2', 'core.y=2@3']);
   });
 
+  it('accepts variables before any section header, as git does (found by the differential test)', () => {
+    const parsed = parseGitConfig('\tPAGER = less\nflag\n[core]\nx = 1\n');
+
+    expect(parsed.errors).toEqual([]);
+    expect(entries('\tPAGER = less\nflag\n[core]\nx = 1\n')).toEqual([
+      'pager=less@1',
+      'flag@2',
+      'core.x=1@4',
+    ]);
+  });
+
   it('keeps "=" inside values', () => {
     expect(entries('[a]\nk = b=c\n')).toEqual(['a.k=b=c@2']);
   });
@@ -94,7 +105,6 @@ describe('parseGitConfig', () => {
   it.each([
     ['an unterminated quote', '[a]\nk = "open\nok = 1\n', 2],
     ['an unknown escape', '[a]\nk = bad\\q\nok = 1\n', 2],
-    ['a variable outside any section', 'k = v\n[a]\nok = 1\n', 1],
     ['an invalid name character', '[a]\nna_me = 1\nok = 1\n', 2],
     ['a comment where "=" is expected', '[a]\nbare # c\nok = 1\n', 2],
     ['junk after a quoted subsection', '[a "s"x]\nk = 1\n[a]\nok = 1\n', 1],
