@@ -43,17 +43,17 @@ agent's own approval prompts. [GitSpawn][gitspawn] used `core.fsmonitor` in `.gi
 GitLab's [ConfigPoisoning][configpoisoning] routed a file through a clean filter selected by
 `.gitattributes`, which `git diff` runs even with `--no-ext-diff --no-textconv`.
 [GhostApproval][ghostapproval] used symlinks to make "workspace" reads and writes land elsewhere.
-And agent hooks run commands the project defines when a session starts: after a one-time
-folder-trust prompt that most users accept in interactive sessions, and with no prompt at all in
-non-interactive runs such as `claude -p`, the Claude Agent SDK or Copilot's cloud agent.
+And agent hooks run commands the project defines when a session starts: behind a one-time
+folder-trust prompt in interactive sessions, and with no prompt at all in non-interactive runs
+such as `claude -p`, the Claude Agent SDK or Copilot's cloud agent.
 
 **How the git attacks arrive.** A plain `git clone` does not copy the remote's `.git/config`, so
 the attacks that need repository config (`core.fsmonitor`, `diff.external`, filter and diff
 drivers, and GIT-004's attributes, which only matter once a driver is defined) need another way
-in. In the research above, that is a zip or tarball shipped with its `.git` directory, a synced
-or shared folder, a copied directory, a CI cache or dev container build, or an agent already
-running on the machine (compromised or prompt-injected) writing the config into a repository
-that was cloned normally. What a clone does carry is a buried bare repository (GIT-008): its
+in. The research above names these: an archive shipped with its `.git` directory, a synced or
+shared folder, a USB stick, a CI cache or a dev container build, or an agent already running on
+the machine (compromised or prompt-injected) writing the config into a repository that was
+cloned normally. What a clone does carry is a buried bare repository (GIT-008): its
 config is ordinary tracked files, and git uses it as soon as anyone runs git inside that
 directory. The agent, IDE, instruction-file, symlink and package rules apply to clones in full.
 
@@ -95,28 +95,34 @@ Node.js 20 or newer and has no runtime dependencies.
 
 The SARIF output works with GitHub code scanning. Exit code 1 (findings) should not stop the
 upload, but exit code 2 (error or incomplete scan) must fail the job, or a partial report would
-pass as clean:
+pass as clean. This is the job this repository runs itself
+([code-scanning.yml](.github/workflows/code-scanning.yml); a test keeps the two identical):
 
 ```yaml
 permissions:
   contents: read
   security-events: write
+  actions: read
 steps:
   - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    with:
+      persist-credentials: false
   - name: Scan with agentsapper
     run: |
       status=0
       npx --yes agentsapper@0.1.0 . --format sarif > agentsapper.sarif || status=$?
       # 1 = findings, reported through code scanning; 2 = error or incomplete scan
       if [ "$status" -ge 2 ]; then exit "$status"; fi
-  - uses: github/codeql-action/upload-sarif@8498dc4c2b27cdd99baf0f87955b29ebbf30c78d # v4.39.1
+  - uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1
     with:
       sarif_file: agentsapper.sarif
 ```
 
-Pin the agentsapper version as you pin actions. A fresh clone never contains the remote's
-`.git/config`, so in CI the git rules mostly matter for buried bare repositories, nested `.git`
-directories and `.gitattributes`; the agent, IDE, instruction-file and symlink rules apply fully.
+Pin the agentsapper version as you pin actions (to commit SHAs, not tag objects). A fresh clone
+never contains the remote's `.git/config`, so in CI the git rules mostly matter for buried bare
+repositories and nested `.git` directories, whose own config can define drivers that
+`.gitattributes` then route files through. The agent, IDE, instruction-file and symlink rules
+apply fully.
 
 ## Rules
 
