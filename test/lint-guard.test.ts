@@ -35,9 +35,15 @@ const FORBIDDEN: [string, string][] = [
   ],
   ['require call', "require('child_process');\n"],
   ['process.binding', "process.binding('spawn_sync');\n"],
+  ['writing a file', "import { writeFileSync } from 'node:fs';\nwriteFileSync('x', 'y');\n"],
+  ['creating a directory', "import { mkdirSync } from 'fs';\nmkdirSync('x');\n"],
+  ['fs/promises', "import { rm } from 'node:fs/promises';\nawait rm('x');\n"],
+  ['a namespace fs import', "import * as fs from 'node:fs';\nfs.unlinkSync('x');\n"],
+  ['a default fs import', "import fs from 'node:fs';\nfs.renameSync('a', 'b');\n"],
+  ['a dynamic fs import', "const fs = await import('node:fs');\nfs.rmSync('x');\n"],
 ];
 
-describe('lint guard: no external processes from src/', () => {
+describe('lint guard: no external processes and no writes from src/', () => {
   it.each(FORBIDDEN)('rejects %s under src/', async (_label, code) => {
     expect(await guardViolations(code, 'src/__lint_probe__.ts')).not.toEqual([]);
   });

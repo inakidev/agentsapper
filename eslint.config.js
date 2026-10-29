@@ -12,6 +12,47 @@ const NO_PROCESS_MESSAGE =
 
 const PROCESS_MODULES = ['child_process', 'node:child_process', 'cluster', 'node:cluster'];
 
+// src/ is read-only: the scanner must never modify the repository it inspects.
+const READ_ONLY_MESSAGE = 'src/ must never write to the filesystem (see CLAUDE.md: read-only).';
+const FS_WRITES = [
+  'appendFile',
+  'appendFileSync',
+  'chmod',
+  'chmodSync',
+  'chown',
+  'chownSync',
+  'copyFile',
+  'copyFileSync',
+  'cp',
+  'cpSync',
+  'createWriteStream',
+  'link',
+  'linkSync',
+  'mkdir',
+  'mkdirSync',
+  'mkdtemp',
+  'mkdtempSync',
+  'promises',
+  'rename',
+  'renameSync',
+  'rm',
+  'rmSync',
+  'rmdir',
+  'rmdirSync',
+  'symlink',
+  'symlinkSync',
+  'truncate',
+  'truncateSync',
+  'unlink',
+  'unlinkSync',
+  'utimes',
+  'utimesSync',
+  'write',
+  'writeFile',
+  'writeFileSync',
+  'writeSync',
+];
+
 export default defineConfig(
   { ignores: ['dist/', 'coverage/'] },
   js.configs.recommended,
@@ -35,6 +76,15 @@ export default defineConfig(
               importNames: ['createRequire'],
               message: NO_PROCESS_MESSAGE,
             })),
+            ...['fs', 'node:fs'].map((name) => ({
+              name,
+              importNames: FS_WRITES,
+              message: READ_ONLY_MESSAGE,
+            })),
+            ...['fs/promises', 'node:fs/promises'].map((name) => ({
+              name,
+              message: READ_ONLY_MESSAGE,
+            })),
           ],
         },
       ],
@@ -51,6 +101,16 @@ export default defineConfig(
         {
           selector: 'CallExpression[callee.name="require"]',
           message: NO_PROCESS_MESSAGE,
+        },
+        {
+          // Named imports only, so the write-function ban above cannot be sidestepped.
+          selector:
+            'ImportDeclaration[source.value=/^(node:)?fs$/] > :matches(ImportNamespaceSpecifier, ImportDefaultSpecifier)',
+          message: `${READ_ONLY_MESSAGE} Import fs functions by name.`,
+        },
+        {
+          selector: 'ImportExpression[source.value=/^(node:)?fs(\\/promises)?$/]',
+          message: `${READ_ONLY_MESSAGE} Import fs functions by name.`,
         },
       ],
       'no-restricted-properties': [
