@@ -1,4 +1,7 @@
 import type { Rule } from '../types.js';
+import { FS_001 } from './fs/fs-001-outside.js';
+import { FS_002 } from './fs/fs-002-sensitive.js';
+import { FS_003 } from './fs/fs-003-agent-config.js';
 import { GIT_001 } from './git/git-001-fsmonitor.js';
 import { GIT_002 } from './git/git-002-exec-keys.js';
 import { GIT_003 } from './git/git-003-drivers.js';
@@ -18,4 +21,7 @@ export const ALL_RULES: readonly Rule[] = [
   GIT_006,
   GIT_007,
   GIT_008,
+  FS_001,
+  FS_002,
+  FS_003,
 ];

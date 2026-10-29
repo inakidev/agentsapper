@@ -6,6 +6,7 @@ export const SOURCES = {
   configPoisoning: 'https://about.gitlab.com/blog/deepseek-reasonix-vulnerability-discovered',
   buriedBareRepos:
     'https://github.com/justinsteven/advisories/blob/main/2022_git_buried_bare_repos_and_fsmonitor_various_abuses.md',
+  ghostApproval: 'https://adversa.ai/blog/top-ai-coding-agent-security-resources-august-2026/',
   gitConfigDocs: 'https://git-scm.com/docs/git-config',
   githooksDocs: 'https://git-scm.com/docs/githooks',
 } as const;

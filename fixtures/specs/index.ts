@@ -1,5 +1,6 @@
 import type { FixtureSpec } from '../spec.js';
 import { specs as benignGit } from './benign-git.js';
+import { specs as fsSymlinks } from './fs-symlinks.js';
 import { specs as git001 } from './git-001-fsmonitor.js';
 import { specs as git002 } from './git-002-exec-keys.js';
 import { specs as git003004 } from './git-003-004-drivers.js';
@@ -17,4 +18,5 @@ export const ALL_SPECS: readonly FixtureSpec[] = [
   ...git006,
   ...git007,
   ...git008,
+  ...fsSymlinks,
 ];
