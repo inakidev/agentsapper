@@ -14,7 +14,9 @@ First release.
   separate Claude session before release).
 - Safe walker with depth, entry, time and file-size limits. Hitting any limit makes the scan
   incomplete and the exit code 2.
-- Text, JSON and SARIF 2.1.0 output; `--format`, `--fail-on`, `--rules` and `--quiet`.
+- Text, JSON and SARIF 2.1.0 output; `--format`, `--fail-on`, `--rules` and `--quiet`. The text
+  report ends with a one-line verdict that matches the exit code.
+- `npm run demo` plants 11 small cases in a temp dir, scans them and prints OK or FAIL.
 - Windows directory junctions are treated as symlinks, and link resolution is tested against
   what the OS actually opens on Linux and Windows.
 - Paths and link targets are compared ignoring case, as Windows and macOS compare them, on

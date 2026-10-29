@@ -25,6 +25,7 @@ GIT-003  Git config defines a filter, diff or merge driver command
   ...
 
 Summary: 1 critical, 1 high, 0 medium, 0 low, 0 info.
+Verdict: do not open this folder with an agent, an IDE or git until you have read the 2 findings at high or above.
 ```
 
 A _sapper_ is the military engineer who clears mines before the troops advance. agentsapper
@@ -32,6 +33,24 @@ clears the repository before the agent goes in.
 
 > Status: 0.1.0. 21 rules across git, filesystem, agent config, instruction files, IDE and
 > package scripts. Zero runtime dependencies. No LLM.
+
+## Quick start
+
+From the folder that contains the repository (Node.js 20 or newer):
+
+```sh
+npx agentsapper ./downloaded-repo
+```
+
+It takes well under a second. Read the last line:
+
+- `Verdict: do not open this folder...` (exit code 1): read the findings first.
+- `Verdict: nothing found` (exit code 0): none of the 21 rules fired. That is not a guarantee;
+  see [Known limitations](#known-limitations).
+
+Always run it from **outside** the folder you are checking. Inside it, npx reads the folder's
+`.npmrc` and `node_modules/.bin`, and on Windows `cmd.exe` looks for programs in the current
+folder first. The repository controls all of these.
 
 ## The problem
 
@@ -88,8 +107,8 @@ Exit codes: `0` nothing at or above `--fail-on`; `1` findings at or above `--fai
 or runtime error, **or an incomplete scan** (a limit was hit or a file could not be read). An
 incomplete scan never passes as clean, so a repository cannot pad itself past the limits to hide.
 
-Run it on a directory before you open it with an agent, an IDE or `npm install`. It needs
-Node.js 20 or newer and has no runtime dependencies.
+Run it before you open a directory with an agent, an IDE or `npm install`. It needs Node.js 20
+or newer and has no runtime dependencies.
 
 ### In CI
 
@@ -111,6 +130,8 @@ steps:
       persist-credentials: false
   # Its own step, so a failed install fails the job instead of passing as exit 1.
   - name: Install agentsapper
+    # From outside the checkout, so its .npmrc cannot redirect the install.
+    working-directory: ${{ runner.temp }}
     run: npm install --global --ignore-scripts agentsapper@0.1.0
   - name: Scan with agentsapper
     run: |
@@ -324,6 +345,7 @@ npm run build          # compile to dist/
 npm run selfscan       # scan this repository with the built CLI; must exit 0
 npm run corpus:fetch   # shallow-clone the benign corpus outside the repo
 npm run eval           # regenerate docs/evaluation/RESULTS.md
+npm run demo           # plant 11 small cases in a temp dir, scan them, print OK or FAIL
 ```
 
 Malicious fixtures exist only as data in `fixtures/specs/`. Tests write them into a fresh
