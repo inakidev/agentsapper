@@ -3,3 +3,5 @@ coverage/
 package-lock.json
 # Maintainer-authored spec; keep its formatting as written.
 docs/PROJECT_BRIEF.md
+# Vendored verbatim; its sha256 is pinned in test/report-sarif.test.ts.
+test/schemas/
