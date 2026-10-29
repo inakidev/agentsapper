@@ -375,6 +375,19 @@ workstation.
 [configpoisoning]: https://about.gitlab.com/blog/deepseek-reasonix-vulnerability-discovered
 [ghostapproval]: https://adversa.ai/blog/top-ai-coding-agent-security-resources-august-2026/
 
+## Disclaimer
+
+- agentsapper is provided as is, without warranty of any kind (see the [license](LICENSE)). A
+  report with no findings means none of its rules fired, not that a repository is safe to open.
+  You remain responsible for what you run.
+- It is an independent project, not affiliated with or endorsed by Anthropic, OpenAI, Google,
+  GitHub, Microsoft, Cursor or any other vendor whose tools it mentions. Product names are used
+  only to describe what is checked. The research it builds on belongs to its authors, linked in
+  [References](#references).
+- The hostile fixtures in this repository exist only as data in `fixtures/specs/`, and the
+  commands they reference are inert. Do not materialize them by hand outside the test harness.
+- Report security issues privately, as described in [SECURITY.md](SECURITY.md).
+
 ## License
 
 [MIT](LICENSE)
