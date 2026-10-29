@@ -64,7 +64,15 @@ function write(base: string, entry: FixtureEntry, fill: (text: string) => string
   }
 }
 
-function createSymlink(target: string, path: string, targetType: 'file' | 'dir'): void {
+function createSymlink(
+  target: string,
+  path: string,
+  targetType: 'file' | 'dir' | 'junction',
+): void {
+  if (targetType === 'junction') {
+    symlinkSync(resolve(dirname(path), target), path, 'junction');
+    return;
+  }
   try {
     symlinkSync(target, path, targetType);
   } catch (error) {

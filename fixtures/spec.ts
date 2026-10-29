@@ -25,7 +25,8 @@ export type FixtureEntry =
       readonly type: 'symlink';
       readonly path: string;
       readonly target: string;
-      readonly targetType: 'file' | 'dir';
+      /** A junction is a Windows-only directory link; its target is made absolute. */
+      readonly targetType: 'file' | 'dir' | 'junction';
     };
 
 export interface ExpectedFinding {
