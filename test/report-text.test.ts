@@ -1,0 +1,102 @@
+import { describe, expect, it } from 'vitest';
+import { escapeForTerminal } from '../src/report/sanitize.js';
+import { formatText } from '../src/report/text.js';
+import { scan } from '../src/scan.js';
+import type { Rule } from '../src/types.js';
+import { fakeRule, finding } from './helpers/rules.js';
+
+describe('escapeForTerminal', () => {
+  it('leaves ordinary text alone', () => {
+    expect(escapeForTerminal('core.fsmonitor = true (\u{f1}, \u{6f22}\u{5b57})')).toBe(
+      'core.fsmonitor = true (\u{f1}, \u{6f22}\u{5b57})',
+    );
+  });
+
+  it('escapes control characters that could drive the terminal', () => {
+    expect(escapeForTerminal('a\u001b[2Jb\nc\rd\te\u0007')).toBe(
+      'a\\u{1b}[2Jb\\u{a}c\\u{d}d\\u{9}e\\u{7}',
+    );
+  });
+
+  it('escapes invisible and bidi characters so the output is truthful', () => {
+    expect(escapeForTerminal('x\u{202e}y\u{200b}z\u{2066}\u{feff}')).toBe(
+      'x\\u{202e}y\\u{200b}z\\u{2066}\\u{feff}',
+    );
+    expect(escapeForTerminal('hi\u{e0041}\u{e007f}')).toBe('hi\\u{e0041}\\u{e007f}');
+  });
+});
+
+describe('formatText', () => {
+  it('says so when there are no findings', () => {
+    const output = formatText(scan('/repo', { rules: [] }));
+
+    expect(output).toContain('Scanned /repo with 0 rules.');
+    expect(output).toContain('No findings.');
+  });
+
+  it('groups findings by severity, most severe first', () => {
+    const output = formatText(
+      scan('/repo', {
+        rules: [
+          fakeRule('TEST-001', [finding({ severity: 'medium', file: 'm.txt' })]),
+          fakeRule('TEST-002', [finding({ severity: 'critical', file: '.git/config', line: 3 })]),
+        ],
+      }),
+    );
+
+    const critical = output.indexOf('== CRITICAL (1) ==');
+    const medium = output.indexOf('== MEDIUM (1) ==');
+    expect(critical).toBeGreaterThan(-1);
+    expect(medium).toBeGreaterThan(critical);
+    expect(output).toContain('TEST-002  Fake rule TEST-002');
+    expect(output).toContain('.git/config:3');
+    expect(output).toContain('Summary: 1 critical, 0 high, 1 medium, 0 low, 0 info.');
+  });
+
+  it('shows evidence, explanation and remediation for each finding', () => {
+    const output = formatText(
+      scan('/repo', {
+        rules: [
+          fakeRule('TEST-001', [
+            finding({ evidence: 'the snippet', message: 'the reason', remediation: 'the fix' }),
+          ]),
+        ],
+      }),
+    );
+
+    expect(output).toContain('the snippet');
+    expect(output).toContain('the reason');
+    expect(output).toContain('the fix');
+  });
+
+  it('never prints raw control characters taken from the scanned repo', () => {
+    const output = formatText(
+      scan('/repo', {
+        rules: [
+          fakeRule('TEST-001', [
+            finding({ file: 'evil\u001b]0;title\u0007.md', evidence: 'line1\nline2\u{202e}' }),
+          ]),
+        ],
+      }),
+    );
+
+    expect(output).not.toContain('\u001b');
+    expect(output).not.toContain('\u{202e}');
+    expect(output).toContain('evil\\u{1b}]0;title\\u{7}.md');
+    expect(output).toContain('line1\\u{a}line2\\u{202e}');
+  });
+
+  it('lists rules that failed to run', () => {
+    const broken: Rule = {
+      ...fakeRule('TEST-001'),
+      run: () => {
+        throw new Error('bad input');
+      },
+    };
+
+    const output = formatText(scan('/repo', { rules: [broken] }));
+
+    expect(output).toContain('Rule errors (1)');
+    expect(output).toContain('TEST-001  bad input');
+  });
+});
