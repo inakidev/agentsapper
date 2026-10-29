@@ -23,6 +23,7 @@ This project builds hostile test fixtures. You are an AI coding agent, which is 
 
 - **Never invoke the `git` binary (or any external process) from `src/`.** Parse `.git/config` and `.gitattributes` with our own parsers. Running `git status` is the very attack we detect. Enforce this with an ESLint `no-restricted-imports` rule banning `child_process` (and `node:child_process`) under `src/`.
 - **Never follow symlinks** while walking the tree. Use `lstat`/`readlink`, resolve targets only as paths for analysis, and never read through them. When a tool would follow an in-repo link to a config file (agents, IDEs and git do), resolve the link as a path and read the target by its own path (`src/rules/linked.ts`); never open the link itself.
+- **Compare names as case-insensitive filesystems do,** on every platform: look files up through the scan context and match names with `src/names.ts`, never with exact string comparison. On Windows and macOS `.Claude/Settings.json` is `.claude/settings.json`.
 - **Read-only:** never modify the scanned repository.
 - **Resource limits:** cap file size read, walk depth, and total time, so a hostile repo cannot hang or exhaust the scanner.
 - **Zero runtime dependencies.** Dev dependencies are fine. Any runtime dependency needs explicit approval from the maintainer.

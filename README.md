@@ -158,7 +158,10 @@ apply fully.
 Instruction files are `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `AGENTS.override.md`,
 `GEMINI.md`, `.cursorrules`, `.windsurfrules`, `.clinerules`, `.cursor/rules/*.mdc`, Claude Code
 rules, commands, agents and skills, Copilot instruction and prompt files, Gemini custom commands,
-and the root README at lower severity. Every rule lists its sources in its `references`
+and the root README at lower severity. Paths are compared the way Windows and macOS compare
+them, ignoring case, on every platform: `.Claude/Settings.json` counts as
+`.claude/settings.json`, and `.GIT/CONFIG` as `.git/config`. Every rule lists its sources in its
+`references`
 (shown in the SARIF output). Experimental rules are heuristics or depend on settings whose
 exact names could not be verified verbatim in official docs.
 
@@ -226,7 +229,7 @@ shows the alert rate on mainstream projects, not a false-positive rate for the w
 
 **Review before release.** The project was built with Claude Code under the maintainer's spec
 and review. Before release, a second-pass review by a separate Claude session (the same model
-that wrote the code, so not an independent review) found three problems, all now fixed and
+that wrote the code, so not an independent review) found four problems, all now fixed and
 covered by fixtures:
 
 - A symlinked `.claude/settings.json` (or a symlinked `.claude` directory, `CLAUDE.md` or
@@ -241,6 +244,12 @@ covered by fixtures:
   Linux and Windows CI jobs.
 - Downloads piped into `python3 -c "exec(sys.stdin.read())"` looked like data pipes. INSTR-003
   now reports inline code that executes its input at high.
+- Names were compared exactly. On Windows and macOS, which ignore case by default, a tool that
+  opens `.claude/settings.json` also opens `.Claude/Settings.json`, and that directory produced no
+  findings. The review raised this for link targets; checking it showed that plain names were
+  affected too. Names are now compared as those filesystems compare them, on every platform,
+  because a repository scanned on Linux is often opened on Windows or macOS. A test runs every
+  fixture again with its paths in upper case.
 
 ## Known limitations
 
@@ -259,12 +268,9 @@ covered by fixtures:
   calls and modules (`exec`, `eval`, `os.system`, `subprocess`, `pickle`, ...), which obfuscated
   code gets past. That is why a download piped in as data is still reported, at low, instead of
   dropped. AGENT-004 depends on setting names verified only through summaries of the docs.
-- **Names are matched exactly.** On case-insensitive filesystems (the default on Windows and
-  macOS), opening `.claude/settings.json` also opens `.Claude/settings.json`, and a link to
-  `Tools/Claude` reaches `tools/claude`; macOS also treats names that differ only in Unicode
-  normalization as the same file. agentsapper matches config paths and link targets exactly, so
-  config spelled differently is not analyzed: a `.Claude` directory produces no findings, and a
-  `.claude` link to `Tools/Claude` only the medium FS-003 finding.
+- **Name comparison is an approximation.** Names are compared with Unicode case folding and
+  normalization. That covers every difference in ASCII case, but each filesystem uses its own
+  tables, so a few rare non-ASCII characters may compare differently there.
 - **Agent config formats change quickly.** The AGENT rules were verified against vendor
   documentation in October 2026 and link to it.
 - **Windows:** antivirus can block reading a hostile file (Windows Defender does so for some

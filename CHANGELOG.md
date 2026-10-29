@@ -17,6 +17,8 @@ First release.
 - Text, JSON and SARIF 2.1.0 output; `--format`, `--fail-on`, `--rules` and `--quiet`.
 - Windows directory junctions are treated as symlinks, and link resolution is tested against
   what the OS actually opens on Linux and Windows.
+- Paths and link targets are compared ignoring case, as Windows and macOS compare them, on
+  every platform: `.Claude/Settings.json` is analyzed as `.claude/settings.json`.
 - Fixture corpus (34 malicious, 2 of them Windows-only, and 8 benign), a container-only
   exploitability harness on git 2.39 and 2.56, a differential test of the config parser against
   git, and a benign-corpus evaluation; results in `docs/evaluation/RESULTS.md`.
