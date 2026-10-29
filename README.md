@@ -4,7 +4,7 @@ Scan an untrusted repository for what it can execute or inject **before** an AI 
 
 ```text
 $ npx agentsapper ./downloaded-repo
-Scanned /home/dev/downloaded-repo with 21 rules.
+Scanned /home/dev/downloaded-repo with 22 rules.
 
 == CRITICAL (1) ==
 
@@ -31,7 +31,7 @@ Verdict: do not open this folder with an agent, an IDE or git until you have rea
 A _sapper_ is the military engineer who clears mines before the troops advance. agentsapper
 clears the repository before the agent goes in.
 
-> Status: 0.1.0. 21 rules across git, filesystem, agent config, instruction files, IDE and
+> Status: 0.1.0. 22 rules across git, filesystem, agent config, instruction files, IDE and
 > package scripts. Zero runtime dependencies. No LLM.
 
 ## Quick start
@@ -45,7 +45,7 @@ npx agentsapper ./downloaded-repo
 It takes well under a second. Read the last line:
 
 - `Verdict: do not open this folder...` (exit code 1): read the findings first.
-- `Verdict: nothing found` (exit code 0): none of the 21 rules fired. That is not a guarantee;
+- `Verdict: nothing found` (exit code 0): none of the 22 rules fired. That is not a guarantee;
   see [Known limitations](#known-limitations).
 
 Always run it from **outside** the folder you are checking. Inside it, npx reads the folder's
@@ -165,6 +165,7 @@ apply fully.
 | FS-001    | Symlink resolving outside the repository                                                                                                                                                                                   | high                                                                                     | stable       |
 | FS-002    | Symlink resolving to credentials or system paths (`~/.ssh`, `~/.aws`, `/etc`, ...)                                                                                                                                         | critical                                                                                 | stable       |
 | FS-003    | Symlink inside an agent or IDE config location, resolving inside the repo                                                                                                                                                  | medium                                                                                   | stable       |
+| FS-004    | A program at the repository root named like a tool agents run (`git.exe`, `node.cmd`, ...), which Windows runs instead of the real one                                                                                     | critical for git, otherwise high                                                         | stable       |
 | AGENT-001 | Claude Code project settings: hooks, helper commands, broad allow rules, `defaultMode`, dangerous `env`, MCP auto-approval, plugins; hooks in agent and skill frontmatter                                                  | critical to medium                                                                       | stable       |
 | AGENT-002 | MCP servers that launch local commands (`.mcp.json`, `.cursor/mcp.json`, `.vscode/mcp.json`, `.gemini/settings.json`, `.codex/config.toml`)                                                                                | critical or high                                                                         | stable       |
 | AGENT-003 | Hooks and setup commands of Cursor, Gemini CLI, Codex and GitHub Copilot                                                                                                                                                   | critical to medium                                                                       | stable       |
@@ -298,9 +299,11 @@ covered by fixtures:
   documentation in October 2026 and link to it.
 - **Windows:** antivirus can block reading a hostile file (Windows Defender does so for some
   install scripts). agentsapper then reports the scan as incomplete and exits 2 rather than
-  calling it clean. Without Developer Mode, git checks out symlinks as plain files, so the FS
-  rules have nothing to see in such a checkout. Directory junctions (`mklink /J`), which need no
-  special rights, are treated as symlinks.
+  calling it clean. Without Developer Mode, git checks out symlinks as plain files holding the
+  link target; agentsapper reads git's index to recognize them and reports them as the links
+  they are on macOS and Linux, so the three systems give the same report (root repository only;
+  other rules still read those files as the plain files Windows tools see). Directory junctions
+  (`mklink /J`), which need no special rights, are treated as symlinks.
 
 ## Threat model
 

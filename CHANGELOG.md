@@ -4,9 +4,12 @@
 
 First release.
 
-- 21 rules: GIT-001 to GIT-008, FS-001 to FS-003, AGENT-001 to AGENT-004, INSTR-001 to INSTR-003,
+- 22 rules: GIT-001 to GIT-008, FS-001 to FS-004, AGENT-001 to AGENT-004, INSTR-001 to INSTR-003,
   IDE-001, IDE-002 and PKG-001. AGENT-004, INSTR-002 and INSTR-003 are experimental.
-- Own parsers for git config, gitattributes, JSONC, a TOML subset and frontmatter. The scanner
+- FS-004: programs at the repository root named like tools agents run, which Windows runs
+  instead of the real ones. Symlinks that git checked out as plain files (Windows without
+  Developer Mode) are recognized from git's index, so all three systems give the same report.
+- Own parsers for git config, gitattributes, git index, JSONC, a TOML subset and frontmatter. The scanner
   never runs git or any other process, never opens a symlink and never writes; lint rules and
   tests enforce this.
 - Config files that agents, IDEs or git reach through in-repo symlinks are analyzed as the tool

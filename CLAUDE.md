@@ -68,6 +68,7 @@ Config file paths and formats for AI agents (Claude Code, Cursor, Codex, Gemini 
 - Work **one phase at a time** (F0–F6 in the brief). At the end of each phase, summarize what was done, what is pending, and any decisions taken, then **stop and wait for confirmation**.
 - TDD: write the fixture spec and the failing test first, then the rule.
 - Small, focused commits using Conventional Commits (`feat(git): add GIT-001 fsmonitor rule`).
+- No `Co-Authored-By` or other attribution trailers in commit messages or PR descriptions (the maintainer asked for this).
 - Ask before making architectural decisions not covered by the brief, or before adding anything listed as out of scope.
 
 ## Commands
