@@ -1,4 +1,8 @@
 import type { Rule } from '../types.js';
+import { AGENT_001 } from './agent/agent-001-claude-code.js';
+import { AGENT_002 } from './agent/agent-002-mcp.js';
+import { AGENT_003 } from './agent/agent-003-other-hooks.js';
+import { AGENT_004 } from './agent/agent-004-auto-approve.js';
 import { FS_001 } from './fs/fs-001-outside.js';
 import { FS_002 } from './fs/fs-002-sensitive.js';
 import { FS_003 } from './fs/fs-003-agent-config.js';
@@ -24,4 +28,8 @@ export const ALL_RULES: readonly Rule[] = [
   FS_001,
   FS_002,
   FS_003,
+  AGENT_001,
+  AGENT_002,
+  AGENT_003,
+  AGENT_004,
 ];
