@@ -52,7 +52,15 @@ export function scan(root: string, options: ScanOptions = {}): ScanResult {
       status,
       references,
     })),
-    findings: findings.sort(compareFindings),
+    // Two repos can share a file (an include, a hook dir); report each finding once.
+    findings: [
+      ...new Map(
+        findings.map((f) => [
+          JSON.stringify([f.ruleId, f.severity, f.file, f.line, f.evidence]),
+          f,
+        ]),
+      ).values(),
+    ].sort(compareFindings),
     errors,
     incomplete: [...ctx.incomplete],
   };
