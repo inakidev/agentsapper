@@ -117,6 +117,85 @@ describe('cli', () => {
     expect(stdout).toContain('== MEDIUM (1) ==');
   });
 
+  it('honors --fail-on', () => {
+    const rules = [fakeRule('TEST-001', [finding({ severity: 'medium' })])];
+
+    expect(run([tmp, '--fail-on', 'medium'], { rules }).code).toBe(EXIT_FINDINGS);
+    expect(run([tmp, '--fail-on', 'critical'], { rules }).code).toBe(EXIT_CLEAN);
+  });
+
+  it.each([
+    ['an unknown format', ['--format', 'xml']],
+    ['an unknown severity', ['--fail-on', 'severe']],
+    ['an unknown rule family', ['--rules', 'NOPE']],
+  ])('rejects %s with a usage error', (_label, flags) => {
+    const { code, stderr } = run([tmp, ...flags], {});
+
+    expect(code).toBe(EXIT_ERROR);
+    expect(stderr).toContain('Usage: agentsapper <path>');
+  });
+
+  it('runs only the selected rule families and ids with --rules', () => {
+    const { stdout } = run([tmp, '--format', 'json', '--rules', 'fs,GIT-001'], {});
+    const ids = (JSON.parse(stdout) as { rules: { id: string }[] }).rules.map((r) => r.id);
+
+    expect(ids).toEqual(['GIT-001', 'FS-001', 'FS-002', 'FS-003']);
+  });
+
+  it('prints machine-readable JSON with --format json', () => {
+    const rules = [fakeRule('TEST-001', [finding({ severity: 'high', file: 'a', line: 3 })])];
+
+    const { code, stdout } = run([tmp, '--format', 'json'], { rules });
+    const report = JSON.parse(stdout) as Record<string, unknown>;
+
+    expect(code).toBe(EXIT_FINDINGS);
+    expect(report).toMatchObject({
+      schemaVersion: 1,
+      tool: { name: 'agentsapper' },
+      complete: true,
+      summary: { high: 1, total: 1 },
+      findings: [{ ruleId: 'TEST-001', severity: 'high', file: 'a', line: 3 }],
+    });
+  });
+
+  it('prints SARIF 2.1.0 with --format sarif', () => {
+    const rules = [fakeRule('TEST-001', [finding({ severity: 'medium', file: 'dir/a b.txt' })])];
+
+    const sarif = JSON.parse(run([tmp, '--format', 'sarif'], { rules }).stdout) as {
+      version: string;
+      runs: {
+        results: {
+          level: string;
+          locations: { physicalLocation: { artifactLocation: { uri: string } } }[];
+        }[];
+      }[];
+    };
+
+    expect(sarif.version).toBe('2.1.0');
+    expect(sarif.runs[0]?.results[0]?.level).toBe('warning');
+    expect(sarif.runs[0]?.results[0]?.locations[0]?.physicalLocation.artifactLocation.uri).toBe(
+      'dir/a%20b.txt',
+    );
+  });
+
+  it('prints nothing with --quiet when nothing reaches --fail-on', () => {
+    const rules = [fakeRule('TEST-001', [finding({ severity: 'low' })])];
+
+    expect(run([tmp, '--quiet'], { rules }).stdout).toBe('');
+  });
+
+  it('prints only findings at or above --fail-on with --quiet', () => {
+    const rules = [
+      fakeRule('TEST-001', [finding({ severity: 'low', evidence: 'minor' })]),
+      fakeRule('TEST-002', [finding({ severity: 'critical', evidence: 'major' })]),
+    ];
+
+    const { stdout } = run([tmp, '--quiet'], { rules });
+
+    expect(stdout).toContain('major');
+    expect(stdout).not.toContain('minor');
+  });
+
   it('exits 2 when the scan is incomplete, even without findings', () => {
     writeFileSync(join(tmp, 'a'), 'a');
     writeFileSync(join(tmp, 'b'), 'b');
