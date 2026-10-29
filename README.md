@@ -68,7 +68,7 @@ Most untrusted-repo checks look at what the agent reads. agentsapper also covers
 executes when the agent merely looks, which matters whenever a repository arrives with its
 `.git` directory or buries one. It parses `.git/config` and `.gitattributes` with its own
 parsers (it never runs `git`, which would trigger the very attack), resolves symlinks as paths
-without ever following them, and checks agent and IDE config against formats verified in each
+without ever opening them, and checks agent and IDE config against formats verified in each
 vendor's documentation.
 
 ## Install and use
@@ -131,29 +131,29 @@ apply fully.
 
 ## Rules
 
-| ID        | Detects                                                                                                                                                                                                                    | Severity                                                          | Status       |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- | ------------ |
-| GIT-001   | `core.fsmonitor` set to a command (any non-boolean value)                                                                                                                                                                  | critical                                                          | stable       |
-| GIT-002   | About 30 config keys that run programs (`diff.external`, `core.pager`, `core.sshCommand`, `core.hooksPath`, `credential.helper`, `gpg.program`, config-defined hooks, aliases with `!`, ...), graded by what triggers them | critical to low                                                   | stable       |
-| GIT-003   | Filter, diff and merge driver commands in git config (`filter.<x>.clean`, `diff.<x>.textconv`, ...)                                                                                                                        | high                                                              | stable       |
-| GIT-004   | `.gitattributes` (including nested files, `info/attributes` and macros) routing files through a config-defined driver                                                                                                      | critical for drivers `git diff` runs, otherwise high              | stable       |
-| GIT-005   | `include.path` / `includeIf` in git config; included repo files are analyzed recursively                                                                                                                                   | high to low                                                       | stable       |
-| GIT-006   | Live hooks in `.git/hooks` or in a `core.hooksPath` directory inside the repo                                                                                                                                              | high or medium                                                    | stable       |
-| GIT-007   | A `.git` file, `.git` symlink or `core.worktree` pointing outside the repository                                                                                                                                           | high                                                              | stable       |
-| GIT-008   | Embedded repositories: buried bare repos and nested `.git` directories                                                                                                                                                     | high                                                              | stable       |
-| FS-001    | Symlink resolving outside the repository                                                                                                                                                                                   | high                                                              | stable       |
-| FS-002    | Symlink resolving to credentials or system paths (`~/.ssh`, `~/.aws`, `/etc`, ...)                                                                                                                                         | critical                                                          | stable       |
-| FS-003    | Symlink inside an agent or IDE config location, resolving inside the repo                                                                                                                                                  | medium                                                            | stable       |
-| AGENT-001 | Claude Code project settings: hooks, helper commands, broad allow rules, `defaultMode`, dangerous `env`, MCP auto-approval, plugins; hooks in agent and skill frontmatter                                                  | critical to medium                                                | stable       |
-| AGENT-002 | MCP servers that launch local commands (`.mcp.json`, `.cursor/mcp.json`, `.vscode/mcp.json`, `.gemini/settings.json`, `.codex/config.toml`)                                                                                | critical or high                                                  | stable       |
-| AGENT-003 | Hooks and setup commands of Cursor, Gemini CLI, Codex and GitHub Copilot                                                                                                                                                   | critical to medium                                                | stable       |
-| AGENT-004 | Workspace settings that auto-approve agent actions (VS Code, Codex)                                                                                                                                                        | high or medium                                                    | experimental |
-| INSTR-001 | Invisible Unicode in instruction files (tag characters, zero-width, bidi), with the hidden text decoded                                                                                                                    | critical (README: high)                                           | stable       |
-| INSTR-002 | Agent-directed instructions hidden in HTML comments or collapsed blocks                                                                                                                                                    | medium (README: low)                                              | experimental |
-| INSTR-003 | Instructions to download and run code, or long encoded payloads                                                                                                                                                            | high (README: low)                                                | experimental |
-| IDE-001   | VS Code tasks with `runOn: folderOpen`                                                                                                                                                                                     | critical with automatic tasks on, otherwise high                  | stable       |
-| IDE-002   | Dev container lifecycle commands                                                                                                                                                                                           | high for `initializeCommand` (runs on the host), otherwise medium | stable       |
-| PKG-001   | `package.json` install lifecycle scripts                                                                                                                                                                                   | high when they download, evaluate or decode code, otherwise info  | stable       |
+| ID        | Detects                                                                                                                                                                                                                    | Severity                                                                                 | Status       |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------ |
+| GIT-001   | `core.fsmonitor` set to a command (any non-boolean value)                                                                                                                                                                  | critical                                                                                 | stable       |
+| GIT-002   | About 30 config keys that run programs (`diff.external`, `core.pager`, `core.sshCommand`, `core.hooksPath`, `credential.helper`, `gpg.program`, config-defined hooks, aliases with `!`, ...), graded by what triggers them | critical to low                                                                          | stable       |
+| GIT-003   | Filter, diff and merge driver commands in git config (`filter.<x>.clean`, `diff.<x>.textconv`, ...)                                                                                                                        | high                                                                                     | stable       |
+| GIT-004   | `.gitattributes` (including nested files, `info/attributes` and macros) routing files through a config-defined driver                                                                                                      | critical for drivers `git diff` runs, otherwise high                                     | stable       |
+| GIT-005   | `include.path` / `includeIf` in git config; included repo files are analyzed recursively                                                                                                                                   | high to low                                                                              | stable       |
+| GIT-006   | Live hooks in `.git/hooks` or in a `core.hooksPath` directory inside the repo                                                                                                                                              | high or medium                                                                           | stable       |
+| GIT-007   | A `.git` file, `.git` symlink or `core.worktree` pointing outside the repository                                                                                                                                           | high                                                                                     | stable       |
+| GIT-008   | Embedded repositories: buried bare repos and nested `.git` directories                                                                                                                                                     | high                                                                                     | stable       |
+| FS-001    | Symlink resolving outside the repository                                                                                                                                                                                   | high                                                                                     | stable       |
+| FS-002    | Symlink resolving to credentials or system paths (`~/.ssh`, `~/.aws`, `/etc`, ...)                                                                                                                                         | critical                                                                                 | stable       |
+| FS-003    | Symlink inside an agent or IDE config location, resolving inside the repo                                                                                                                                                  | medium                                                                                   | stable       |
+| AGENT-001 | Claude Code project settings: hooks, helper commands, broad allow rules, `defaultMode`, dangerous `env`, MCP auto-approval, plugins; hooks in agent and skill frontmatter                                                  | critical to medium                                                                       | stable       |
+| AGENT-002 | MCP servers that launch local commands (`.mcp.json`, `.cursor/mcp.json`, `.vscode/mcp.json`, `.gemini/settings.json`, `.codex/config.toml`)                                                                                | critical or high                                                                         | stable       |
+| AGENT-003 | Hooks and setup commands of Cursor, Gemini CLI, Codex and GitHub Copilot                                                                                                                                                   | critical to medium                                                                       | stable       |
+| AGENT-004 | Workspace settings that auto-approve agent actions (VS Code, Codex)                                                                                                                                                        | high or medium                                                                           | experimental |
+| INSTR-001 | Invisible Unicode in instruction files (tag characters, zero-width, bidi), with the hidden text decoded                                                                                                                    | critical (README: high)                                                                  | stable       |
+| INSTR-002 | Agent-directed instructions hidden in HTML comments or collapsed blocks                                                                                                                                                    | medium (README: low)                                                                     | experimental |
+| INSTR-003 | Instructions to download and run code, or long encoded payloads                                                                                                                                                            | high when the download runs as code, low when it is piped in as data (README: low, info) | experimental |
+| IDE-001   | VS Code tasks with `runOn: folderOpen`                                                                                                                                                                                     | critical with automatic tasks on, otherwise high                                         | stable       |
+| IDE-002   | Dev container lifecycle commands                                                                                                                                                                                           | high for `initializeCommand` (runs on the host), otherwise medium                        | stable       |
+| PKG-001   | `package.json` install lifecycle scripts                                                                                                                                                                                   | high when they download, evaluate or decode code, otherwise info                         | stable       |
 
 Instruction files are `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `AGENTS.override.md`,
 `GEMINI.md`, `.cursorrules`, `.windsurfrules`, `.clinerules`, `.cursor/rules/*.mdc`, Claude Code
@@ -219,8 +219,8 @@ and FS findings show up at all.
   inline Python, at high; it now reports such data pipes at low instead of high, but still
   reports them, because inline code that executes its input looks the same at a glance.
 
-16 repositories is a small sample, picked to exercise the features agentsapper inspects; it shows the alert rate on mainstream
-projects, not a false-positive rate for the wider ecosystem.
+16 repositories is a small sample, picked to exercise the features agentsapper inspects; it
+shows the alert rate on mainstream projects, not a false-positive rate for the wider ecosystem.
 
 **Review before release.** The project was built with Claude Code under the maintainer's spec
 and review. Before release, a second-pass review by a separate Claude session (the same model
@@ -235,7 +235,8 @@ covered by fixtures:
 - Link targets were normalized as text, so `.claude -> a/b/../conf` with `a/b` itself a link was
   analyzed at a different place than the one the kernel resolves. Links are now resolved
   component by component as the OS does (POSIX applies `..` after following a link; Win32
-  normalizes it first).
+  normalizes it first). A test checks the resolver against what the OS actually opens, in the
+  Linux and Windows CI jobs.
 - Downloads piped into `python3 -c "exec(sys.stdin.read())"` looked like data pipes. INSTR-003
   now reports inline code that executes its input at high.
 
@@ -252,13 +253,23 @@ covered by fixtures:
   bare repository, `.gitmodules` URLs, hard links, Windows shortcut files, and your own global or
   system git config.
 - **Heuristic rules** (INSTR-002, INSTR-003) will have false positives; they are signals to
-  review. AGENT-004 depends on setting names verified only through summaries of the docs.
+  review. INSTR-003 decides whether inline code runs a download it reads from a blocklist of
+  calls and modules (`exec`, `eval`, `os.system`, `subprocess`, `pickle`, ...), which obfuscated
+  code gets past. That is why a download piped in as data is still reported, at low, instead of
+  dropped. AGENT-004 depends on setting names verified only through summaries of the docs.
+- **Names are matched exactly.** On case-insensitive filesystems (the default on Windows and
+  macOS), opening `.claude/settings.json` also opens `.Claude/settings.json`, and a link to
+  `Tools/Claude` reaches `tools/claude`; macOS also treats names that differ only in Unicode
+  normalization as the same file. agentsapper matches config paths and link targets exactly, so
+  config spelled differently is not analyzed: a `.Claude` directory produces no findings, and a
+  `.claude` link to `Tools/Claude` only the medium FS-003 finding.
 - **Agent config formats change quickly.** The AGENT rules were verified against vendor
   documentation in October 2026 and link to it.
 - **Windows:** antivirus can block reading a hostile file (Windows Defender does so for some
   install scripts). agentsapper then reports the scan as incomplete and exits 2 rather than
   calling it clean. Without Developer Mode, git checks out symlinks as plain files, so the FS
-  rules have nothing to see in such a checkout.
+  rules have nothing to see in such a checkout. Directory junctions (`mklink /J`), which need no
+  special rights, are treated as symlinks.
 
 ## Threat model
 
