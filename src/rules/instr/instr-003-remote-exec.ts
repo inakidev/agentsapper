@@ -6,9 +6,51 @@ import { instructionFiles } from './files.js';
 // Instructions telling the agent to download and run code, or carrying an
 // encoded payload. Heuristic: install docs legitimately contain some of these.
 
-const PATTERNS: readonly { re: RegExp; what: string }[] = [
+const DOWNLOAD_PIPE =
+  /\b(?:curl|wget|iwr|irm|Invoke-WebRequest|Invoke-RestMethod)\b[^\n|]{0,300}\|\s*(?:sudo\s+)?(sh|bash|zsh|dash|ksh|python3?|node|perl|ruby|iex|Invoke-Expression|pwsh|powershell)\b([^\n]*)/i;
+
+/**
+ * True when the interpreter runs the download as its program: `| sh`, `| python3 -`,
+ * `| bash -s -- args`. False when the download is only input data for inline code or a
+ * script file (`| python3 -c "..."`, `| node -e ...`, `| python3 tools/parse.py`), which
+ * is common in docs (found in cline/cline by the benign-corpus evaluation).
+ */
+export function pipesDownloadIntoInterpreter(row: string): boolean {
+  const match = DOWNLOAD_PIPE.exec(row);
+  if (match === null) return false;
+  const interpreter = (match[1] ?? '').toLowerCase();
+  if (/^(iex|invoke-expression|pwsh|powershell)$/.test(interpreter)) return true;
+  const inline = INLINE_CODE_FLAG[interpreter.replace(/3$/, '')];
+  const args =
+    (match[2] ?? '')
+      .split(/[|;&)`]/)[0]
+      ?.trim()
+      .split(/\s+/) ?? [];
+  for (const arg of args) {
+    if (arg === '' || arg === '-' || arg === '--' || arg.startsWith('-s')) return true;
+    if (inline?.test(arg) === true) return false; // inline code or a module: the download is data
+    if (arg.startsWith('-')) continue; // other interpreter flags
+    return !/^[\w./~$]/.test(arg); // a script path: the download is its input
+  }
+  return true;
+}
+
+/** Flags that make the interpreter run code given on the command line instead of stdin. */
+const INLINE_CODE_FLAG: Readonly<Record<string, RegExp>> = {
+  sh: /^-[a-z]*c/,
+  bash: /^-[a-z]*c/,
+  zsh: /^-[a-z]*c/,
+  dash: /^-[a-z]*c/,
+  ksh: /^-[a-z]*c/,
+  python: /^-[a-zA-Z]*[cm]/,
+  node: /^(-[ep]|--eval|--print)/,
+  perl: /^-[a-zA-Z]*e/,
+  ruby: /^-[a-zA-Z]*e/,
+};
+
+const PATTERNS: readonly { re: { test(row: string): boolean }; what: string }[] = [
   {
-    re: /\b(curl|wget|iwr|irm|Invoke-WebRequest|Invoke-RestMethod)\b[^\n|]{0,300}\|\s*(sudo\s+)?(sh|bash|zsh|dash|ksh|python3?|node|perl|ruby|iex|Invoke-Expression|pwsh|powershell)\b/i,
+    re: { test: pipesDownloadIntoInterpreter },
     what: 'pipes a download straight into an interpreter',
   },
   {
