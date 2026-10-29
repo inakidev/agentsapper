@@ -167,8 +167,10 @@ exact names could not be verified verbatim in official docs.
 Full tables: [docs/evaluation/RESULTS.md](docs/evaluation/RESULTS.md). Reproduce them with
 `npm run corpus:fetch && npm run eval`, or with the Evaluation workflow on Linux.
 
-**Fixture corpus.** 32 malicious fixtures (each reproducing a published technique or a known
-evasion, with a link to its source) and 8 benign false-positive traps. All 110 expected findings
+**Fixture corpus.** 34 malicious fixtures (each reproducing a published technique or a known
+evasion, with a link to its source) and 8 benign false-positive traps. Two are Windows-only
+(directory junctions, and the Win32 treatment of `..` in link targets) and run in the Windows CI
+jobs; one is POSIX-only. On Linux, all 110 expected findings of the other 32 malicious fixtures
 are detected with the expected file, line and severity, with no unexpected findings. These
 fixtures were written alongside the rules, so treat this as a regression suite rather than an
 independent measure of detection.
@@ -200,7 +202,7 @@ vite, execa, devcontainers/templates, anthropics/claude-code, google-gemini/gemi
 openai/codex, modelcontextprotocol/servers, cline/cline, requests, flask, pydantic), each pinned
 to the commit in [scripts/benign-corpus.json](scripts/benign-corpus.json) (their default
 branches on 2026-10-29), so `npm run corpus:fetch` reproduces the exact trees. Each scan took
-under 0.3 s. The sample leans on purpose towards agent tooling repositories, which is why AGENT
+under 0.4 s. The sample leans on purpose towards agent tooling repositories, which is why AGENT
 and FS findings show up at all.
 
 - **2 of 16 would fail a CI gate at the default `--fail-on high`.** Both are `SessionStart` hooks

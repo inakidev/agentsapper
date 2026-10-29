@@ -15,7 +15,10 @@ First release.
 - Safe walker with depth, entry, time and file-size limits. Hitting any limit makes the scan
   incomplete and the exit code 2.
 - Text, JSON and SARIF 2.1.0 output; `--format`, `--fail-on`, `--rules` and `--quiet`.
-- Fixture corpus (32 malicious, 8 benign), a container-only exploitability harness on git 2.39
+- Windows directory junctions are treated as symlinks, and link resolution is tested against
+  what the OS actually opens on Linux and Windows.
+- Fixture corpus (34 malicious, 2 of them Windows-only, and 8 benign), a container-only
+  exploitability harness on git 2.39
   and 2.56, a differential test of the config parser against git, and a benign-corpus
   evaluation; results in `docs/evaluation/RESULTS.md`.
-- Published from CI with npm provenance.
+- Published from CI with npm provenance, only from tags that point to a commit on main.
