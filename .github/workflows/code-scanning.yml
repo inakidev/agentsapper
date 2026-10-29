@@ -2,20 +2,19 @@ name: Code scanning
 
 # The README's "In CI" example, verbatim between the markers below
 # (test/readme-ci.test.ts fails if they drift apart). It scans this repository
-# with the published package, so it runs after a successful release and on
-# demand, and it needs code scanning enabled (a public repository).
+# with the published package, weekly and on demand. Releases are staged and
+# only go public once approved on npmjs.com, so a run right after the Release
+# workflow would not find the new version yet; run it by hand after approving.
 
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: [Release]
-    types: [completed]
+  schedule:
+    - cron: '17 6 * * 1'
 
 jobs:
   agentsapper:
     name: agentsapper (published package)
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     # README snippet begins
     permissions:
       contents: read
