@@ -95,7 +95,9 @@ Node.js 20 or newer and has no runtime dependencies.
 
 The SARIF output works with GitHub code scanning. Exit code 1 (findings) should not stop the
 upload, but exit code 2 (error or incomplete scan) must fail the job, or a partial report would
-pass as clean. This is the job this repository runs itself
+pass as clean. Install in a separate step: npm's own failures (a network error, or a version not
+yet on the registry) also exit with 1 and would otherwise pass as findings. This is the job this
+repository runs itself
 ([code-scanning.yml](.github/workflows/code-scanning.yml); a test keeps the two identical):
 
 ```yaml
@@ -107,10 +109,13 @@ steps:
   - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
     with:
       persist-credentials: false
+  # Its own step, so a failed install fails the job instead of passing as exit 1.
+  - name: Install agentsapper
+    run: npm install --global --ignore-scripts agentsapper@0.1.0
   - name: Scan with agentsapper
     run: |
       status=0
-      npx --yes agentsapper@0.1.0 . --format sarif > agentsapper.sarif || status=$?
+      agentsapper . --format sarif > agentsapper.sarif || status=$?
       # 1 = findings, reported through code scanning; 2 = error or incomplete scan
       if [ "$status" -ge 2 ]; then exit "$status"; fi
   - uses: github/codeql-action/upload-sarif@9b3254085494b55a0f7c4c2b3d2d52cc712ce370 # v4.39.1

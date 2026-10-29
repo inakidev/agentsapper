@@ -27,10 +27,14 @@ describe('README CI example', () => {
     expect(dedent(snippet ?? '')).toBe(dedent(job ?? ''));
   });
 
-  it('pins agentsapper and actions to exact versions', () => {
+  it('pins actions to commits and agentsapper to the version being released', () => {
     const job = workflow.slice(workflow.indexOf('# README snippet begins'));
+    const { version } = JSON.parse(
+      readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+    ) as { version: string };
 
-    expect(job).toMatch(/npx --yes agentsapper@\d+\.\d+\.\d+ /);
+    // Bumping package.json fails this test until the example scans with the new version.
+    expect(job.match(/agentsapper@\S+/g)).toEqual([`agentsapper@${version}`]);
     for (const uses of job.match(/uses: \S+/g) ?? []) expect(uses).toMatch(/@[0-9a-f]{40}$/);
   });
 });
