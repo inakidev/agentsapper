@@ -19,9 +19,11 @@ export function linkFinding(
   severity: Finding['severity'],
   message: string,
 ): Finding {
-  const where = link.inAgentConfig
-    ? ' It sits where agents and IDEs load config or instructions, so they read it without asking.'
-    : '';
+  // FS-003 is about the location itself, so its message already says this.
+  const where =
+    link.inAgentConfig && ruleId !== 'FS-003'
+      ? ' It sits where agents and IDEs load config or instructions, so they read it without asking.'
+      : '';
   return {
     ruleId,
     severity,

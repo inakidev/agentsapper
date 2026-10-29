@@ -24,8 +24,8 @@ export const GIT_001: Rule = {
           evidence: clip(evidenceOf(e)),
           message:
             'git runs this command every time it refreshes the index, which git status and git ' +
-            'diff do. Coding agents run those as soon as they open a repository, often before ' +
-            'any approval prompt (GitSpawn).',
+            'diff do. Coding agents run those as soon as they open a repository, in several ' +
+            'documented cases before showing their own trust dialog (GitSpawn).',
           remediation:
             `Do not run git or an agent here until you remove core.fsmonitor from ${e.file} ` +
             '(or set it to false).' +

@@ -91,7 +91,7 @@ function settingsFindings(ctx: ScanContext, file: string): Finding[] {
       hook.kind === 'http'
         ? `A ${hook.event} hook sends hook payloads (prompts, tool inputs, file paths) to this URL.`
         : auto
-          ? `Claude Code runs this command on ${hook.event}, as soon as a session starts and before any approval prompt.`
+          ? `Claude Code runs this command on ${hook.event}, as soon as a session starts: after the one-time folder-trust prompt in interactive sessions, and with no prompt at all in claude -p and SDK runs.`
           : `Claude Code runs this command on every ${hook.event} event, outside the tool permission prompts.`,
       removeKey(`the ${hook.event} hook`),
     );
