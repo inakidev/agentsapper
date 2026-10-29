@@ -64,7 +64,7 @@ Generated configs (fixed seed) with legal and illegal syntax are parsed by agent
 
 16 popular, legitimate repositories, shallow-cloned on 2026-10-29 (linux).
 **2 of 16** would fail a CI gate at the default `--fail-on high`.
-Every finding below was reviewed by hand; see the README for the discussion.
+Each finding below is discussed in the README.
 
 | Repository                                                           | Commit    | Critical | High | Medium | Low | Info | Fails at high | Scan time |
 | -------------------------------------------------------------------- | --------- | -------: | ---: | -----: | --: | ---: | :-----------: | --------: |

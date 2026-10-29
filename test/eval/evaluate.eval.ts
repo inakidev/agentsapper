@@ -244,7 +244,7 @@ function markdown(
     '',
     `${benign.repos.length} popular, legitimate repositories, shallow-cloned on ${benign.fetchedAt.slice(0, 10)} (${benign.platform}).`,
     `**${failing.length} of ${benign.repos.length}** would fail a CI gate at the default \`--fail-on ${FAIL_ON}\`.`,
-    'Every finding below was reviewed by hand; see the README for the discussion.',
+    'Each finding below is discussed in the README.',
     '',
     '| Repository | Commit | Critical | High | Medium | Low | Info | Fails at high | Scan time |',
     '|---|---|---:|---:|---:|---:|---:|:---:|---:|',
