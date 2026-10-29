@@ -3,10 +3,10 @@ name: Release
 # Stages a publish to npm when a vX.Y.Z tag is pushed, with npm provenance, so users can
 # verify the package was built from this repository by this workflow.
 #
-# Requirements: the repository must be public (npm provenance needs a public
-# source repo) and an NPM_TOKEN secret with publish rights must exist in the
-# "npm" environment. Once the package exists on npm, switch to npm trusted
-# publishing for this workflow and delete the token.
+# Authenticates through npm trusted publishing (OIDC), with no token: on npmjs.com
+# the package lists this repository, release.yml and the "npm" environment as its
+# trusted publisher. A new trusted publisher entry must be used within 2 days.
+# Provenance needs the repository to be public.
 
 on:
   push:
@@ -36,7 +36,6 @@ jobs:
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
       - run: npm ci --ignore-scripts
       - name: Tag must match package.json version
         run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
@@ -56,5 +55,3 @@ jobs:
         working-directory: ${{ runner.temp }}
         run: npm install --global --ignore-scripts npm@11
       - run: npm stage publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
