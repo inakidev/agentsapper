@@ -214,7 +214,7 @@ and FS findings show up at all.
   inline Python, at high; it now reports such data pipes at low instead of high, but still
   reports them, because inline code that executes its input looks the same at a glance.
 
-16 repositories is a small sample chosen by hand; it shows the alert rate on mainstream
+16 repositories is a small sample, picked to exercise the features agentsapper inspects; it shows the alert rate on mainstream
 projects, not a false-positive rate for the wider ecosystem.
 
 **Review before release.** The project was built with Claude Code under the maintainer's spec
