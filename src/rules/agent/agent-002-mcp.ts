@@ -5,7 +5,7 @@ import { at, filesMatching, lineOf, readJsonc, readToml, runsRegistryPackage } f
 
 // Project MCP config files and the key holding the server map, verified against:
 // Claude Code https://code.claude.com/docs/en/mcp (.mcp.json, mcpServers),
-// Cursor https://cursor.com/docs/context/mcp (.cursor/mcp.json, mcpServers),
+// Cursor https://cursor.com/docs/mcp (.cursor/mcp.json, mcpServers),
 // VS Code https://code.visualstudio.com/docs/agents/reference/mcp-configuration (.vscode/mcp.json, servers),
 // Gemini CLI https://github.com/google-gemini/gemini-cli/blob/main/docs/tools/mcp-server.md (.gemini/settings.json, mcpServers),
 // Codex https://learn.chatgpt.com/docs/extend/mcp (.codex/config.toml, [mcp_servers.<name>]).
@@ -111,7 +111,7 @@ export const AGENT_002: Rule = {
   status: 'stable',
   references: [
     'https://code.claude.com/docs/en/mcp',
-    'https://cursor.com/docs/context/mcp',
+    'https://cursor.com/docs/mcp',
     'https://code.visualstudio.com/docs/agents/reference/mcp-configuration',
     'https://github.com/google-gemini/gemini-cli/blob/main/docs/tools/mcp-server.md',
     'https://learn.chatgpt.com/docs/extend/mcp',

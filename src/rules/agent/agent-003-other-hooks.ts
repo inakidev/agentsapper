@@ -12,7 +12,7 @@ import {
 } from './common.js';
 
 // Hook and command files of agents other than Claude Code, verified against:
-// Cursor https://cursor.com/docs/agent/hooks (.cursor/hooks.json, run in trusted workspaces)
+// Cursor https://cursor.com/docs/hooks (.cursor/hooks.json, run in trusted workspaces)
 //   and https://cursor.com/docs/cloud-agent/setup (.cursor/environment.json, cloud VM)
 // Gemini CLI https://github.com/google-gemini/gemini-cli/blob/main/docs/hooks/reference.md
 //   and docs/cli/custom-commands.md (.gemini/commands/*.toml, !{...} shell injection)
@@ -128,7 +128,7 @@ export const AGENT_003: Rule = {
   severity: 'high',
   status: 'stable',
   references: [
-    'https://cursor.com/docs/agent/hooks',
+    'https://cursor.com/docs/hooks',
     'https://cursor.com/docs/cloud-agent/setup',
     'https://github.com/google-gemini/gemini-cli/blob/main/docs/hooks/reference.md',
     'https://learn.chatgpt.com/docs/hooks',

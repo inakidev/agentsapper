@@ -5,7 +5,7 @@ import type { RuleInfo } from '../types.js';
 
 // SARIF 2.1.0 for GitHub code scanning and other consumers.
 // https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html
-// https://docs.github.com/en/code-security/code-scanning/integrating-with-code-scanning/sarif-support-for-code-scanning
+// https://docs.github.com/en/code-security/reference/code-scanning/sarif-files/sarif-support
 
 const LEVEL: Readonly<Record<Severity, 'error' | 'warning' | 'note'>> = {
   critical: 'error',

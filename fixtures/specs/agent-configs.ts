@@ -6,7 +6,7 @@ const M = MARKER_COMMAND;
 const DOCS = {
   claude: 'https://code.claude.com/docs/en/hooks',
   mcp: 'https://code.claude.com/docs/en/mcp',
-  cursorHooks: 'https://cursor.com/docs/agent/hooks',
+  cursorHooks: 'https://cursor.com/docs/hooks',
   vscodeAi: 'https://code.visualstudio.com/docs/agents/reference/ai-settings',
 };
 
