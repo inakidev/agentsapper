@@ -3,9 +3,9 @@
   "fixtures": {
     "perRule": {
       "GIT-001": {
-        "expected": 4,
-        "detected": 4,
-        "exactSeverity": 4,
+        "expected": 5,
+        "detected": 5,
+        "exactSeverity": 5,
         "unexpected": 0
       },
       "GIT-002": {
@@ -63,15 +63,15 @@
         "unexpected": 0
       },
       "FS-003": {
-        "expected": 3,
-        "detected": 3,
-        "exactSeverity": 3,
+        "expected": 6,
+        "detected": 6,
+        "exactSeverity": 6,
         "unexpected": 0
       },
       "AGENT-001": {
-        "expected": 11,
-        "detected": 11,
-        "exactSeverity": 11,
+        "expected": 13,
+        "detected": 13,
+        "exactSeverity": 13,
         "unexpected": 0
       },
       "AGENT-002": {
@@ -93,9 +93,9 @@
         "unexpected": 0
       },
       "INSTR-001": {
-        "expected": 4,
-        "detected": 4,
-        "exactSeverity": 4,
+        "expected": 5,
+        "detected": 5,
+        "exactSeverity": 5,
         "unexpected": 0
       },
       "INSTR-002": {
@@ -105,9 +105,9 @@
         "unexpected": 0
       },
       "INSTR-003": {
-        "expected": 4,
-        "detected": 4,
-        "exactSeverity": 4,
+        "expected": 6,
+        "detected": 6,
+        "exactSeverity": 6,
         "unexpected": 0
       },
       "IDE-001": {
@@ -335,7 +335,7 @@
       {
         "id": "agent-003-other-hooks",
         "kind": "malicious",
-        "source": "https://cursor.com/docs/agent/hooks",
+        "source": "https://cursor.com/docs/hooks",
         "expected": 8,
         "detected": 8,
         "unexpected": [],
@@ -380,8 +380,8 @@
         "id": "instr-003-remote-exec",
         "kind": "malicious",
         "source": "https://genai.owasp.org/llmrisk/llm01-prompt-injection/",
-        "expected": 4,
-        "detected": 4,
+        "expected": 6,
+        "detected": 6,
         "unexpected": [],
         "incomplete": []
       },
@@ -436,12 +436,48 @@
         "detected": 0,
         "unexpected": [],
         "incomplete": []
+      },
+      {
+        "id": "linked-claude-settings-file",
+        "kind": "malicious",
+        "source": "https://code.claude.com/docs/en/hooks",
+        "expected": 2,
+        "detected": 2,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "linked-claude-config-dir",
+        "kind": "malicious",
+        "source": "https://code.claude.com/docs/en/hooks",
+        "expected": 2,
+        "detected": 2,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "linked-instruction-file",
+        "kind": "malicious",
+        "source": "https://adversa.ai/blog/top-ai-coding-agent-security-resources-august-2026/",
+        "expected": 2,
+        "detected": 2,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "linked-git-config",
+        "kind": "malicious",
+        "source": "https://labs.cloudsecurityalliance.org/research/csa-research-note-ai-coding-agent-git-config-rce-20260904-cs/",
+        "expected": 1,
+        "detected": 1,
+        "unexpected": [],
+        "incomplete": []
       }
     ],
     "skipped": 0
   },
   "benign": {
-    "fetchedAt": "2026-10-29T19:23:40.509Z",
+    "fetchedAt": "2026-10-29T20:06:17.808Z",
     "platform": "linux",
     "repos": [
       {
@@ -450,7 +486,7 @@
         "why": "git hooks manager; prepare script",
         "commit": "3f0023dc10d7003d70f2e31aa56300eab80e76d6",
         "checkout": "complete",
-        "ms": 4,
+        "ms": 3,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -469,7 +505,7 @@
         "why": "classic Node project",
         "commit": "1c6f1b0fe4000977b9a7b4f34097e4d527dd9824",
         "checkout": "complete",
-        "ms": 14,
+        "ms": 12,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -488,7 +524,7 @@
         "why": "husky hooks, lifecycle scripts",
         "commit": "9d11464a75ee5c644c0308d742f58755c0482594",
         "checkout": "complete",
-        "ms": 40,
+        "ms": 29,
         "bySeverity": {
           "info": 2,
           "low": 0,
@@ -526,7 +562,7 @@
         "why": "large Node project with tooling config",
         "commit": "97431f86d5dc7cd60ade6415393b906cf08fe46c",
         "checkout": "complete",
-        "ms": 68,
+        "ms": 50,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -545,7 +581,7 @@
         "why": "VS Code config, lifecycle scripts",
         "commit": "c7a823c43bd050b6d7855d50814517d0e65b23af",
         "checkout": "complete",
-        "ms": 331,
+        "ms": 258,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -564,7 +600,7 @@
         "why": "pnpm monorepo, VS Code config",
         "commit": "cce559ab158cc6b177d0911a0bea73436b48faff",
         "checkout": "complete",
-        "ms": 117,
+        "ms": 90,
         "bySeverity": {
           "info": 2,
           "low": 0,
@@ -596,7 +632,7 @@
         "why": "small Node library",
         "commit": "247faa0ff0641020e8790475989cee72df85d62b",
         "checkout": "complete",
-        "ms": 20,
+        "ms": 14,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -615,7 +651,7 @@
         "why": "many devcontainer.json files with lifecycle commands",
         "commit": "4e753eab1195ea28a325fde4bee60bd9fadc9d3e",
         "checkout": "complete",
-        "ms": 14,
+        "ms": 13,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -641,7 +677,7 @@
         "why": "dev container and Claude Code project config",
         "commit": "58d6da1e34d6cd1c6379dcbf568bd66f5f9b6102",
         "checkout": "complete",
-        "ms": 48,
+        "ms": 38,
         "bySeverity": {
           "info": 0,
           "low": 2,
@@ -679,7 +715,7 @@
         "why": "GEMINI.md and .gemini config",
         "commit": "4a8383b9db43aed3f1a1acef0b5114d810722195",
         "checkout": "complete",
-        "ms": 80,
+        "ms": 57,
         "bySeverity": {
           "info": 3,
           "low": 0,
@@ -745,9 +781,9 @@
         "name": "codex",
         "url": "https://github.com/openai/codex",
         "why": "AGENTS.md and agent tooling",
-        "commit": "7f1c09979c79579c43b953762effe22eabc20e06",
+        "commit": "297f5e33a5f917863a7b83f262c9ef1431bc0267",
         "checkout": "complete",
-        "ms": 199,
+        "ms": 173,
         "bySeverity": {
           "info": 1,
           "low": 3,
@@ -791,7 +827,7 @@
         "why": "MCP servers, npx-based configs in docs",
         "commit": "194cc86e3ae6400958555bd4116849d822d69263",
         "checkout": "complete",
-        "ms": 33,
+        "ms": 25,
         "bySeverity": {
           "info": 4,
           "low": 0,
@@ -839,9 +875,9 @@
         "name": "cline",
         "url": "https://github.com/cline/cline",
         "why": "agent rules files, VS Code extension config",
-        "commit": "1facdca6e7f4efe37abd557d854a5cf69ab98403",
+        "commit": "b194fe9faf15cf1d73e1506b2c9c783aa307d9c6",
         "checkout": "complete",
-        "ms": 134,
+        "ms": 101,
         "bySeverity": {
           "info": 1,
           "low": 0,
@@ -946,7 +982,7 @@
         "why": "Python project with dev tooling",
         "commit": "d086db856be187255b8ec61ef409357393020f32",
         "checkout": "complete",
-        "ms": 8,
+        "ms": 4,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -972,7 +1008,7 @@
         "why": "Python project with pre-commit and CI config",
         "commit": "dd0c36a4be235522e34659ba372c59b43b55f33e",
         "checkout": "complete",
-        "ms": 21,
+        "ms": 15,
         "bySeverity": {
           "info": 0,
           "low": 0,
