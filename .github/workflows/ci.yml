@@ -33,6 +33,7 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm run selfscan
+      - run: npm run demo
 
   # The dev toolchain needs Node 22+, but the published CLI promises Node 20+.
   # Build on a current Node, pack it, then run the packed CLI on the oldest

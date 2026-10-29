@@ -41,7 +41,8 @@
     "test": "vitest run",
     "selfscan": "node dist/bin.js .",
     "corpus:fetch": "node scripts/fetch-benign-corpus.mjs",
-    "eval": "vitest run --config vitest.eval.config.ts"
+    "eval": "vitest run --config vitest.eval.config.ts",
+    "demo": "node scripts/demo.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

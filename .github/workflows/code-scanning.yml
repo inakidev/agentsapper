@@ -27,6 +27,8 @@ jobs:
           persist-credentials: false
       # Its own step, so a failed install fails the job instead of passing as exit 1.
       - name: Install agentsapper
+        # From outside the checkout, so its .npmrc cannot redirect the install.
+        working-directory: ${{ runner.temp }}
         run: npm install --global --ignore-scripts agentsapper@0.1.0
       - name: Scan with agentsapper
         run: |
