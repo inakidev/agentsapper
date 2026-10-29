@@ -63,15 +63,15 @@
         "unexpected": 0
       },
       "FS-003": {
-        "expected": 6,
-        "detected": 6,
-        "exactSeverity": 6,
+        "expected": 7,
+        "detected": 7,
+        "exactSeverity": 7,
         "unexpected": 0
       },
       "AGENT-001": {
-        "expected": 13,
-        "detected": 13,
-        "exactSeverity": 13,
+        "expected": 14,
+        "detected": 14,
+        "exactSeverity": 14,
         "unexpected": 0
       },
       "AGENT-002": {
@@ -105,9 +105,9 @@
         "unexpected": 0
       },
       "INSTR-003": {
-        "expected": 6,
-        "detected": 6,
-        "exactSeverity": 6,
+        "expected": 10,
+        "detected": 10,
+        "exactSeverity": 10,
         "unexpected": 0
       },
       "IDE-001": {
@@ -380,8 +380,8 @@
         "id": "instr-003-remote-exec",
         "kind": "malicious",
         "source": "https://genai.owasp.org/llmrisk/llm01-prompt-injection/",
-        "expected": 6,
-        "detected": 6,
+        "expected": 10,
+        "detected": 10,
         "unexpected": [],
         "incomplete": []
       },
@@ -465,6 +465,15 @@
         "incomplete": []
       },
       {
+        "id": "linked-dir-dotdot",
+        "kind": "malicious",
+        "source": "https://code.claude.com/docs/en/hooks",
+        "expected": 2,
+        "detected": 2,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
         "id": "linked-git-config",
         "kind": "malicious",
         "source": "https://labs.cloudsecurityalliance.org/research/csa-research-note-ai-coding-agent-git-config-rce-20260904-cs/",
@@ -477,7 +486,7 @@
     "skipped": 0
   },
   "benign": {
-    "fetchedAt": "2026-10-29T20:06:17.808Z",
+    "fetchedAt": "2026-10-29T20:43:43.483Z",
     "platform": "linux",
     "repos": [
       {
@@ -486,7 +495,7 @@
         "why": "git hooks manager; prepare script",
         "commit": "3f0023dc10d7003d70f2e31aa56300eab80e76d6",
         "checkout": "complete",
-        "ms": 3,
+        "ms": 2,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -505,7 +514,7 @@
         "why": "classic Node project",
         "commit": "1c6f1b0fe4000977b9a7b4f34097e4d527dd9824",
         "checkout": "complete",
-        "ms": 12,
+        "ms": 9,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -524,7 +533,7 @@
         "why": "husky hooks, lifecycle scripts",
         "commit": "9d11464a75ee5c644c0308d742f58755c0482594",
         "checkout": "complete",
-        "ms": 29,
+        "ms": 25,
         "bySeverity": {
           "info": 2,
           "low": 0,
@@ -562,7 +571,7 @@
         "why": "large Node project with tooling config",
         "commit": "97431f86d5dc7cd60ade6415393b906cf08fe46c",
         "checkout": "complete",
-        "ms": 50,
+        "ms": 39,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -581,7 +590,7 @@
         "why": "VS Code config, lifecycle scripts",
         "commit": "c7a823c43bd050b6d7855d50814517d0e65b23af",
         "checkout": "complete",
-        "ms": 258,
+        "ms": 236,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -600,7 +609,7 @@
         "why": "pnpm monorepo, VS Code config",
         "commit": "cce559ab158cc6b177d0911a0bea73436b48faff",
         "checkout": "complete",
-        "ms": 90,
+        "ms": 74,
         "bySeverity": {
           "info": 2,
           "low": 0,
@@ -632,7 +641,7 @@
         "why": "small Node library",
         "commit": "247faa0ff0641020e8790475989cee72df85d62b",
         "checkout": "complete",
-        "ms": 14,
+        "ms": 10,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -651,7 +660,7 @@
         "why": "many devcontainer.json files with lifecycle commands",
         "commit": "4e753eab1195ea28a325fde4bee60bd9fadc9d3e",
         "checkout": "complete",
-        "ms": 13,
+        "ms": 9,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -677,7 +686,7 @@
         "why": "dev container and Claude Code project config",
         "commit": "58d6da1e34d6cd1c6379dcbf568bd66f5f9b6102",
         "checkout": "complete",
-        "ms": 38,
+        "ms": 33,
         "bySeverity": {
           "info": 0,
           "low": 2,
@@ -715,7 +724,7 @@
         "why": "GEMINI.md and .gemini config",
         "commit": "4a8383b9db43aed3f1a1acef0b5114d810722195",
         "checkout": "complete",
-        "ms": 57,
+        "ms": 68,
         "bySeverity": {
           "info": 3,
           "low": 0,
@@ -783,7 +792,7 @@
         "why": "AGENTS.md and agent tooling",
         "commit": "297f5e33a5f917863a7b83f262c9ef1431bc0267",
         "checkout": "complete",
-        "ms": 173,
+        "ms": 142,
         "bySeverity": {
           "info": 1,
           "low": 3,
@@ -827,7 +836,7 @@
         "why": "MCP servers, npx-based configs in docs",
         "commit": "194cc86e3ae6400958555bd4116849d822d69263",
         "checkout": "complete",
-        "ms": 25,
+        "ms": 22,
         "bySeverity": {
           "info": 4,
           "low": 0,
@@ -877,10 +886,10 @@
         "why": "agent rules files, VS Code extension config",
         "commit": "b194fe9faf15cf1d73e1506b2c9c783aa307d9c6",
         "checkout": "complete",
-        "ms": 101,
+        "ms": 183,
         "bySeverity": {
           "info": 1,
-          "low": 0,
+          "low": 1,
           "medium": 9,
           "high": 0,
           "critical": 1
@@ -950,6 +959,12 @@
             "evidence": ".claude/skills/tuistory -> ../../.cline/skills/tuistory"
           },
           {
+            "ruleId": "INSTR-003",
+            "severity": "low",
+            "location": ".claude/skills/publish-extension/SKILL.md:98",
+            "evidence": "curl -s \"https://open-vsx.org/api/saoudrizwan/claude-dev\" | python3 -c \"import json,sys; d=json.load(sys.stdin); print(d['version'], d['timestamp'])\""
+          },
+          {
             "ruleId": "PKG-001",
             "severity": "info",
             "location": "package.json:16",
@@ -963,7 +978,7 @@
         "why": "classic Python project",
         "commit": "3c7baaa05ab4aa49cc819ce3a819d260de19c157",
         "checkout": "complete",
-        "ms": 4,
+        "ms": 3,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -1008,7 +1023,7 @@
         "why": "Python project with pre-commit and CI config",
         "commit": "dd0c36a4be235522e34659ba372c59b43b55f33e",
         "checkout": "complete",
-        "ms": 15,
+        "ms": 12,
         "bySeverity": {
           "info": 0,
           "low": 0,
