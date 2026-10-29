@@ -1,0 +1,990 @@
+{
+  "rules": 21,
+  "fixtures": {
+    "perRule": {
+      "GIT-001": {
+        "expected": 4,
+        "detected": 4,
+        "exactSeverity": 4,
+        "unexpected": 0
+      },
+      "GIT-002": {
+        "expected": 13,
+        "detected": 13,
+        "exactSeverity": 13,
+        "unexpected": 0
+      },
+      "GIT-003": {
+        "expected": 4,
+        "detected": 4,
+        "exactSeverity": 4,
+        "unexpected": 0
+      },
+      "GIT-004": {
+        "expected": 3,
+        "detected": 3,
+        "exactSeverity": 3,
+        "unexpected": 0
+      },
+      "GIT-005": {
+        "expected": 3,
+        "detected": 3,
+        "exactSeverity": 3,
+        "unexpected": 0
+      },
+      "GIT-006": {
+        "expected": 3,
+        "detected": 3,
+        "exactSeverity": 3,
+        "unexpected": 0
+      },
+      "GIT-007": {
+        "expected": 3,
+        "detected": 3,
+        "exactSeverity": 3,
+        "unexpected": 0
+      },
+      "GIT-008": {
+        "expected": 2,
+        "detected": 2,
+        "exactSeverity": 2,
+        "unexpected": 0
+      },
+      "FS-001": {
+        "expected": 3,
+        "detected": 3,
+        "exactSeverity": 3,
+        "unexpected": 0
+      },
+      "FS-002": {
+        "expected": 4,
+        "detected": 4,
+        "exactSeverity": 4,
+        "unexpected": 0
+      },
+      "FS-003": {
+        "expected": 3,
+        "detected": 3,
+        "exactSeverity": 3,
+        "unexpected": 0
+      },
+      "AGENT-001": {
+        "expected": 11,
+        "detected": 11,
+        "exactSeverity": 11,
+        "unexpected": 0
+      },
+      "AGENT-002": {
+        "expected": 6,
+        "detected": 6,
+        "exactSeverity": 6,
+        "unexpected": 0
+      },
+      "AGENT-003": {
+        "expected": 8,
+        "detected": 8,
+        "exactSeverity": 8,
+        "unexpected": 0
+      },
+      "AGENT-004": {
+        "expected": 4,
+        "detected": 4,
+        "exactSeverity": 4,
+        "unexpected": 0
+      },
+      "INSTR-001": {
+        "expected": 4,
+        "detected": 4,
+        "exactSeverity": 4,
+        "unexpected": 0
+      },
+      "INSTR-002": {
+        "expected": 3,
+        "detected": 3,
+        "exactSeverity": 3,
+        "unexpected": 0
+      },
+      "INSTR-003": {
+        "expected": 4,
+        "detected": 4,
+        "exactSeverity": 4,
+        "unexpected": 0
+      },
+      "IDE-001": {
+        "expected": 2,
+        "detected": 2,
+        "exactSeverity": 2,
+        "unexpected": 0
+      },
+      "IDE-002": {
+        "expected": 4,
+        "detected": 4,
+        "exactSeverity": 4,
+        "unexpected": 0
+      },
+      "PKG-001": {
+        "expected": 4,
+        "detected": 4,
+        "exactSeverity": 4,
+        "unexpected": 0
+      }
+    },
+    "fixtures": [
+      {
+        "id": "benign-standard-repo",
+        "kind": "benign",
+        "expected": 0,
+        "detected": 0,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "benign-git-lfs",
+        "kind": "benign",
+        "expected": 0,
+        "detected": 0,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "benign-submodule-checkout",
+        "kind": "benign",
+        "expected": 0,
+        "detected": 0,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "benign-fsmonitor-overridden",
+        "kind": "benign",
+        "expected": 0,
+        "detected": 0,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "git-001-fsmonitor",
+        "kind": "malicious",
+        "source": "https://labs.cloudsecurityalliance.org/research/csa-research-note-ai-coding-agent-git-config-rce-20260904-cs/",
+        "expected": 1,
+        "detected": 1,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "git-001-fsmonitor-obfuscated",
+        "kind": "malicious",
+        "source": "https://labs.cloudsecurityalliance.org/research/csa-research-note-ai-coding-agent-git-config-rce-20260904-cs/",
+        "expected": 1,
+        "detected": 1,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "git-002-exec-keys",
+        "kind": "malicious",
+        "source": "https://about.gitlab.com/blog/deepseek-reasonix-vulnerability-discovered",
+        "expected": 11,
+        "detected": 11,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "git-003-004-filter-clean",
+        "kind": "malicious",
+        "source": "https://about.gitlab.com/blog/deepseek-reasonix-vulnerability-discovered",
+        "expected": 2,
+        "detected": 2,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "git-004-macro-and-nested",
+        "kind": "malicious",
+        "source": "https://about.gitlab.com/blog/deepseek-reasonix-vulnerability-discovered",
+        "expected": 3,
+        "detected": 3,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "git-004-merge-driver",
+        "kind": "malicious",
+        "source": "https://about.gitlab.com/blog/deepseek-reasonix-vulnerability-discovered",
+        "expected": 2,
+        "detected": 2,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "git-005-include",
+        "kind": "malicious",
+        "source": "https://git-scm.com/docs/git-config",
+        "expected": 4,
+        "detected": 4,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "git-006-hooks",
+        "kind": "malicious",
+        "source": "https://git-scm.com/docs/githooks",
+        "expected": 4,
+        "detected": 4,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "git-007-gitfile-outside",
+        "kind": "malicious",
+        "source": "https://git-scm.com/docs/git-config",
+        "expected": 1,
+        "detected": 1,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "git-007-symlink-outside",
+        "kind": "malicious",
+        "source": "https://git-scm.com/docs/git-config",
+        "expected": 1,
+        "detected": 1,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "git-007-worktree-outside",
+        "kind": "malicious",
+        "source": "https://git-scm.com/docs/git-config",
+        "expected": 1,
+        "detected": 1,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "git-008-embedded-bare",
+        "kind": "malicious",
+        "source": "https://github.com/justinsteven/advisories/blob/main/2022_git_buried_bare_repos_and_fsmonitor_various_abuses.md",
+        "expected": 2,
+        "detected": 2,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "git-008-nested-dotgit",
+        "kind": "malicious",
+        "source": "https://github.com/justinsteven/advisories/blob/main/2022_git_buried_bare_repos_and_fsmonitor_various_abuses.md",
+        "expected": 2,
+        "detected": 2,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "fs-001-outside",
+        "kind": "malicious",
+        "source": "https://adversa.ai/blog/top-ai-coding-agent-security-resources-august-2026/",
+        "expected": 3,
+        "detected": 3,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "fs-002-sensitive",
+        "kind": "malicious",
+        "source": "https://adversa.ai/blog/top-ai-coding-agent-security-resources-august-2026/",
+        "expected": 4,
+        "detected": 4,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "fs-003-config-dirs",
+        "kind": "malicious",
+        "source": "https://adversa.ai/blog/top-ai-coding-agent-security-resources-august-2026/",
+        "expected": 3,
+        "detected": 3,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "benign-internal-symlinks",
+        "kind": "benign",
+        "expected": 0,
+        "detected": 0,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "agent-001-claude-settings",
+        "kind": "malicious",
+        "source": "https://code.claude.com/docs/en/hooks",
+        "expected": 11,
+        "detected": 11,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "agent-002-mcp-servers",
+        "kind": "malicious",
+        "source": "https://code.claude.com/docs/en/mcp",
+        "expected": 6,
+        "detected": 6,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "agent-003-other-hooks",
+        "kind": "malicious",
+        "source": "https://cursor.com/docs/agent/hooks",
+        "expected": 8,
+        "detected": 8,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "agent-004-auto-approve",
+        "kind": "malicious",
+        "source": "https://code.visualstudio.com/docs/agents/reference/ai-settings",
+        "expected": 4,
+        "detected": 4,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "benign-agent-config",
+        "kind": "benign",
+        "expected": 0,
+        "detected": 0,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "instr-001-invisible-unicode",
+        "kind": "malicious",
+        "source": "https://embracethered.com/blog/posts/2024/hiding-and-finding-text-with-unicode-tags/",
+        "expected": 4,
+        "detected": 4,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "instr-002-hidden-comments",
+        "kind": "malicious",
+        "source": "https://genai.owasp.org/llmrisk/llm01-prompt-injection/",
+        "expected": 3,
+        "detected": 3,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "instr-003-remote-exec",
+        "kind": "malicious",
+        "source": "https://genai.owasp.org/llmrisk/llm01-prompt-injection/",
+        "expected": 4,
+        "detected": 4,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "benign-instruction-files",
+        "kind": "benign",
+        "expected": 0,
+        "detected": 0,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "ide-001-folder-open-task",
+        "kind": "malicious",
+        "source": "https://code.visualstudio.com/docs/debugtest/tasks",
+        "expected": 1,
+        "detected": 1,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "ide-001-automatic-tasks",
+        "kind": "malicious",
+        "source": "https://code.visualstudio.com/docs/debugtest/tasks",
+        "expected": 1,
+        "detected": 1,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "ide-002-devcontainer",
+        "kind": "malicious",
+        "source": "https://containers.dev/implementors/json_reference/",
+        "expected": 4,
+        "detected": 4,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "pkg-001-lifecycle-scripts",
+        "kind": "malicious",
+        "source": "https://docs.npmjs.com/cli/using-npm/scripts",
+        "expected": 4,
+        "detected": 4,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "benign-ide-and-package",
+        "kind": "benign",
+        "expected": 0,
+        "detected": 0,
+        "unexpected": [],
+        "incomplete": []
+      }
+    ],
+    "skipped": 0
+  },
+  "benign": {
+    "fetchedAt": "2026-10-29T19:23:40.509Z",
+    "platform": "linux",
+    "repos": [
+      {
+        "name": "husky",
+        "url": "https://github.com/typicode/husky",
+        "why": "git hooks manager; prepare script",
+        "commit": "3f0023dc10d7003d70f2e31aa56300eab80e76d6",
+        "checkout": "complete",
+        "ms": 4,
+        "bySeverity": {
+          "info": 0,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": []
+      },
+      {
+        "name": "express",
+        "url": "https://github.com/expressjs/express",
+        "why": "classic Node project",
+        "commit": "1c6f1b0fe4000977b9a7b4f34097e4d527dd9824",
+        "checkout": "complete",
+        "ms": 14,
+        "bySeverity": {
+          "info": 0,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": []
+      },
+      {
+        "name": "axios",
+        "url": "https://github.com/axios/axios",
+        "why": "husky hooks, lifecycle scripts",
+        "commit": "9d11464a75ee5c644c0308d742f58755c0482594",
+        "checkout": "complete",
+        "ms": 40,
+        "bySeverity": {
+          "info": 2,
+          "low": 0,
+          "medium": 1,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": [
+          {
+            "ruleId": "IDE-002",
+            "severity": "medium",
+            "location": ".devcontainer/devcontainer.json:7",
+            "evidence": "postCreateCommand: npm ci --ignore-scripts"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "docs/package.json:15",
+            "evidence": "scripts.postinstall: patch-package --exclude nothing"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "package.json:139",
+            "evidence": "scripts.prepare: husky"
+          }
+        ]
+      },
+      {
+        "name": "eslint",
+        "url": "https://github.com/eslint/eslint",
+        "why": "large Node project with tooling config",
+        "commit": "97431f86d5dc7cd60ade6415393b906cf08fe46c",
+        "checkout": "complete",
+        "ms": 68,
+        "bySeverity": {
+          "info": 0,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": []
+      },
+      {
+        "name": "prettier",
+        "url": "https://github.com/prettier/prettier",
+        "why": "VS Code config, lifecycle scripts",
+        "commit": "c7a823c43bd050b6d7855d50814517d0e65b23af",
+        "checkout": "complete",
+        "ms": 331,
+        "bySeverity": {
+          "info": 0,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": []
+      },
+      {
+        "name": "vite",
+        "url": "https://github.com/vitejs/vite",
+        "why": "pnpm monorepo, VS Code config",
+        "commit": "cce559ab158cc6b177d0911a0bea73436b48faff",
+        "checkout": "complete",
+        "ms": 117,
+        "bySeverity": {
+          "info": 2,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": [
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "package.json:21",
+            "evidence": "scripts.preinstall: npx only-allow pnpm"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "package.json:22",
+            "evidence": "scripts.postinstall: simple-git-hooks"
+          }
+        ]
+      },
+      {
+        "name": "execa",
+        "url": "https://github.com/sindresorhus/execa",
+        "why": "small Node library",
+        "commit": "247faa0ff0641020e8790475989cee72df85d62b",
+        "checkout": "complete",
+        "ms": 20,
+        "bySeverity": {
+          "info": 0,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": []
+      },
+      {
+        "name": "devcontainer-templates",
+        "url": "https://github.com/devcontainers/templates",
+        "why": "many devcontainer.json files with lifecycle commands",
+        "commit": "4e753eab1195ea28a325fde4bee60bd9fadc9d3e",
+        "checkout": "complete",
+        "ms": 14,
+        "bySeverity": {
+          "info": 0,
+          "low": 0,
+          "medium": 1,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": [
+          {
+            "ruleId": "IDE-002",
+            "severity": "medium",
+            "location": ".devcontainer/devcontainer.json:8",
+            "evidence": "postCreateCommand: npm install -g @devcontainers/cli"
+          }
+        ]
+      },
+      {
+        "name": "claude-code",
+        "url": "https://github.com/anthropics/claude-code",
+        "why": "dev container and Claude Code project config",
+        "commit": "58d6da1e34d6cd1c6379dcbf568bd66f5f9b6102",
+        "checkout": "complete",
+        "ms": 48,
+        "bySeverity": {
+          "info": 0,
+          "low": 2,
+          "medium": 1,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": [
+          {
+            "ruleId": "IDE-002",
+            "severity": "medium",
+            "location": ".devcontainer/devcontainer.json:55",
+            "evidence": "postStartCommand: sudo /usr/local/bin/init-firewall.sh"
+          },
+          {
+            "ruleId": "INSTR-003",
+            "severity": "low",
+            "location": "README.md:23",
+            "evidence": "curl -fsSL https://claude.ai/install.sh | bash"
+          },
+          {
+            "ruleId": "INSTR-003",
+            "severity": "low",
+            "location": "README.md:33",
+            "evidence": "irm https://claude.ai/install.ps1 | iex"
+          }
+        ]
+      },
+      {
+        "name": "gemini-cli",
+        "url": "https://github.com/google-gemini/gemini-cli",
+        "why": "GEMINI.md and .gemini config",
+        "commit": "4a8383b9db43aed3f1a1acef0b5114d810722195",
+        "checkout": "complete",
+        "ms": 80,
+        "bySeverity": {
+          "info": 3,
+          "low": 0,
+          "medium": 5,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": [
+          {
+            "ruleId": "AGENT-003",
+            "severity": "medium",
+            "location": ".gemini/commands/core.toml:2",
+            "evidence": "!{find packages/core \\( -path packages/cli/dist -o -path packages/core/dist -o -name node_modules \\) -prune -o -type f \\( -name \"*.ts\" -o -name \"*.tsx\" \\) ! -name \"*.test.ts\" ! -name \"*.test.tsx\" !..."
+          },
+          {
+            "ruleId": "AGENT-003",
+            "severity": "medium",
+            "location": ".gemini/commands/frontend.toml:2",
+            "evidence": "!{find packages/cli -path packages/cli/dist -prune -o -type f \\( -name \"*.ts\" -o -name \"*.tsx\" \\) ! -name \"*.test.ts\" ! -name \"*.test.tsx\" ! -name \"*.d.ts\" -exec echo \"--- {}"
+          },
+          {
+            "ruleId": "AGENT-003",
+            "severity": "medium",
+            "location": ".gemini/commands/full-context.toml:2",
+            "evidence": "!{find packages/cli packages/core \\( -path packages/cli/dist -o -path packages/core/dist -o -name node_modules \\) -prune -o -type f \\( -name \"*.ts\" -o -name \"*.tsx\" \\) ! -name \"*.test.ts\" ! -name \"..."
+          },
+          {
+            "ruleId": "AGENT-003",
+            "severity": "medium",
+            "location": ".gemini/commands/review-and-fix.toml:2",
+            "evidence": "!{git log --pretty=format:\"%s\" -n 5}"
+          },
+          {
+            "ruleId": "AGENT-003",
+            "severity": "medium",
+            "location": ".gemini/commands/review-frontend.toml:2",
+            "evidence": "!{git log --pretty=format:\"%s\" -n 5}"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "package.json:73",
+            "evidence": "scripts.prepare: husky && npm run bundle"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "packages/vscode-ide-companion/package.json:114",
+            "evidence": "scripts.prepare: npm run generate:notices"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "third_party/get-ripgrep/package.json:13",
+            "evidence": "scripts.postinstall: node ./src/postinstall.js"
+          }
+        ]
+      },
+      {
+        "name": "codex",
+        "url": "https://github.com/openai/codex",
+        "why": "AGENTS.md and agent tooling",
+        "commit": "7f1c09979c79579c43b953762effe22eabc20e06",
+        "checkout": "complete",
+        "ms": 199,
+        "bySeverity": {
+          "info": 1,
+          "low": 3,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": [
+          {
+            "ruleId": "INSTR-003",
+            "severity": "low",
+            "location": "README.md:19",
+            "evidence": "curl -fsSL https://chatgpt.com/codex/install.sh | sh"
+          },
+          {
+            "ruleId": "INSTR-003",
+            "severity": "low",
+            "location": "README.md:25",
+            "evidence": "powershell -ExecutionPolicy ByPass -c \"irm https://chatgpt.com/codex/install.ps1 | iex\""
+          },
+          {
+            "ruleId": "INSTR-003",
+            "severity": "low",
+            "location": "README.md:35",
+            "evidence": "$env:CODEX_INSTALLER_USE_RELEASES_OPENAI_COM='false'; irm https://chatgpt.com/codex/install.ps1 | iex"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "sdk/typescript/package.json:45",
+            "evidence": "scripts.prepare: pnpm run build"
+          }
+        ]
+      },
+      {
+        "name": "mcp-servers",
+        "url": "https://github.com/modelcontextprotocol/servers",
+        "why": "MCP servers, npx-based configs in docs",
+        "commit": "194cc86e3ae6400958555bd4116849d822d69263",
+        "checkout": "complete",
+        "ms": 33,
+        "bySeverity": {
+          "info": 4,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 1
+        },
+        "failsAtDefault": true,
+        "incomplete": [],
+        "errors": [],
+        "findings": [
+          {
+            "ruleId": "AGENT-001",
+            "severity": "critical",
+            "location": ".claude/settings.json:8",
+            "evidence": "hooks.SessionStart: node \"$CLAUDE_PROJECT_DIR/scripts/session-instructions-check.mjs\""
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "src/everything/package.json:26",
+            "evidence": "scripts.prepare: npm run build"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "src/filesystem/package.json:26",
+            "evidence": "scripts.prepare: npm run build"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "src/memory/package.json:26",
+            "evidence": "scripts.prepare: npm run build"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "src/sequentialthinking/package.json:26",
+            "evidence": "scripts.prepare: npm run build"
+          }
+        ]
+      },
+      {
+        "name": "cline",
+        "url": "https://github.com/cline/cline",
+        "why": "agent rules files, VS Code extension config",
+        "commit": "1facdca6e7f4efe37abd557d854a5cf69ab98403",
+        "checkout": "complete",
+        "ms": 134,
+        "bySeverity": {
+          "info": 1,
+          "low": 0,
+          "medium": 9,
+          "high": 0,
+          "critical": 1
+        },
+        "failsAtDefault": true,
+        "incomplete": [],
+        "errors": [],
+        "findings": [
+          {
+            "ruleId": "AGENT-001",
+            "severity": "critical",
+            "location": ".claude/settings.json:8",
+            "evidence": "hooks.SessionStart: $CLAUDE_PROJECT_DIR/.claude/hooks/claude-code-for-web-setup.sh"
+          },
+          {
+            "ruleId": "FS-003",
+            "severity": "medium",
+            "location": ".claude/commands/hotfix-release.md",
+            "evidence": ".claude/commands/hotfix-release.md -> ../../.clinerules/workflows/hotfix-release.md"
+          },
+          {
+            "ruleId": "FS-003",
+            "severity": "medium",
+            "location": ".claude/commands/release.md",
+            "evidence": ".claude/commands/release.md -> ../../.clinerules/workflows/release.md"
+          },
+          {
+            "ruleId": "FS-003",
+            "severity": "medium",
+            "location": ".claude/skills/cline-sdk",
+            "evidence": ".claude/skills/cline-sdk -> ../../.agents/skills/cline-sdk"
+          },
+          {
+            "ruleId": "FS-003",
+            "severity": "medium",
+            "location": ".claude/skills/desktop-whats-new",
+            "evidence": ".claude/skills/desktop-whats-new -> ../../.cline/skills/desktop-whats-new"
+          },
+          {
+            "ruleId": "FS-003",
+            "severity": "medium",
+            "location": ".claude/skills/opentui",
+            "evidence": ".claude/skills/opentui -> ../../.agents/skills/opentui"
+          },
+          {
+            "ruleId": "FS-003",
+            "severity": "medium",
+            "location": ".claude/skills/publish-cli",
+            "evidence": ".claude/skills/publish-cli -> ../../.cline/skills/publish-cli"
+          },
+          {
+            "ruleId": "FS-003",
+            "severity": "medium",
+            "location": ".claude/skills/publish-desktop",
+            "evidence": ".claude/skills/publish-desktop -> ../../.cline/skills/publish-desktop"
+          },
+          {
+            "ruleId": "FS-003",
+            "severity": "medium",
+            "location": ".claude/skills/publish-extension",
+            "evidence": ".claude/skills/publish-extension -> ../../.cline/skills/publish-extension"
+          },
+          {
+            "ruleId": "FS-003",
+            "severity": "medium",
+            "location": ".claude/skills/tuistory",
+            "evidence": ".claude/skills/tuistory -> ../../.cline/skills/tuistory"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "package.json:16",
+            "evidence": "scripts.prepare: husky"
+          }
+        ]
+      },
+      {
+        "name": "requests",
+        "url": "https://github.com/psf/requests",
+        "why": "classic Python project",
+        "commit": "3c7baaa05ab4aa49cc819ce3a819d260de19c157",
+        "checkout": "complete",
+        "ms": 4,
+        "bySeverity": {
+          "info": 0,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": []
+      },
+      {
+        "name": "flask",
+        "url": "https://github.com/pallets/flask",
+        "why": "Python project with dev tooling",
+        "commit": "d086db856be187255b8ec61ef409357393020f32",
+        "checkout": "complete",
+        "ms": 8,
+        "bySeverity": {
+          "info": 0,
+          "low": 0,
+          "medium": 1,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": [
+          {
+            "ruleId": "IDE-002",
+            "severity": "medium",
+            "location": ".devcontainer/devcontainer.json:16",
+            "evidence": "onCreateCommand: .devcontainer/on-create-command.sh"
+          }
+        ]
+      },
+      {
+        "name": "pydantic",
+        "url": "https://github.com/pydantic/pydantic",
+        "why": "Python project with pre-commit and CI config",
+        "commit": "dd0c36a4be235522e34659ba372c59b43b55f33e",
+        "checkout": "complete",
+        "ms": 21,
+        "bySeverity": {
+          "info": 0,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": []
+      }
+    ]
+  }
+}
