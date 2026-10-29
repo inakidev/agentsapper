@@ -1,0 +1,53 @@
+name: Release
+
+# Publishes to npm when a vX.Y.Z tag is pushed, with npm provenance, so users can
+# verify the package was built from this repository by this workflow.
+#
+# Requirements: the repository must be public (npm provenance needs a public
+# source repo) and an NPM_TOKEN secret with publish rights must exist in the
+# "npm" environment. Once the package exists on npm, switch to npm trusted
+# publishing for this workflow and delete the token.
+
+on:
+  push:
+    tags: ['v*.*.*']
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: Verify and publish to npm
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: npm
+    permissions:
+      contents: read
+      id-token: write # npm provenance
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - run: npm ci --ignore-scripts
+      - name: Tag must match package.json version
+        run: test "v$(node -p "require('./package.json').version")" = "$GITHUB_REF_NAME"
+      - name: Fetch SARIF 2.1.0 schema
+        run: |
+          mkdir -p node_modules/.cache
+          curl -sfL https://json.schemastore.org/sarif-2.1.0.json -o node_modules/.cache/sarif-2.1.0.json
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      # Built here, explicitly: .npmrc disables lifecycle scripts, so nothing
+      # would rebuild dist/ during publish.
+      - run: npm run build
+      - run: npm run selfscan
+      - run: npm pack --dry-run
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
