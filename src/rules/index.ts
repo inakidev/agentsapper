@@ -1,4 +1,7 @@
 import type { Rule } from '../types.js';
+import { IDE_001 } from './ide/ide-001-folder-open-task.js';
+import { IDE_002 } from './ide/ide-002-devcontainer.js';
+import { PKG_001 } from './pkg/pkg-001-lifecycle-scripts.js';
 import { AGENT_001 } from './agent/agent-001-claude-code.js';
 import { AGENT_002 } from './agent/agent-002-mcp.js';
 import { AGENT_003 } from './agent/agent-003-other-hooks.js';
@@ -38,4 +41,7 @@ export const ALL_RULES: readonly Rule[] = [
   INSTR_001,
   INSTR_002,
   INSTR_003,
+  IDE_001,
+  IDE_002,
+  PKG_001,
 ];
