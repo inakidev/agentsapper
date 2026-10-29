@@ -36,6 +36,8 @@ export const specs: FixtureSpec[] = [
       ),
       { type: 'file', path: '.git/info/attributes', content: '[attr]innocent diff=evil\n' },
       { type: 'file', path: 'docs/.gitattributes', content: '*.md innocent\n' },
+      { type: 'file', path: 'docs/guide.md', content: '# Guide\n' },
+      { type: 'file', path: 'src/main.c', content: 'int main(void) { return 0; }\n' },
       {
         type: 'file',
         path: 'src/.gitattributes',
