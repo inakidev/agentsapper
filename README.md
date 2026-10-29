@@ -2,7 +2,8 @@
 
 Scan an untrusted repository **before** an AI coding agent opens it.
 
-> Status: early development. The scanner skeleton works, but no detection rules ship yet.
+> Status: early development. The git rules (GIT-001 to GIT-008) work; the other rule families
+> are in progress.
 
 Most untrusted-repo checks look at what the agent reads. agentsapper also covers what git
 executes when the agent merely looks: git config execution sinks, `.gitattributes` drivers,

@@ -6,6 +6,7 @@ import { GIT_004 } from './git/git-004-attributes.js';
 import { GIT_005 } from './git/git-005-include.js';
 import { GIT_006 } from './git/git-006-hooks.js';
 import { GIT_007 } from './git/git-007-escapes.js';
+import { GIT_008 } from './git/git-008-embedded.js';
 
 /** Every rule shipped with agentsapper, in catalog order. */
 export const ALL_RULES: readonly Rule[] = [
@@ -16,4 +17,5 @@ export const ALL_RULES: readonly Rule[] = [
   GIT_005,
   GIT_006,
   GIT_007,
+  GIT_008,
 ];

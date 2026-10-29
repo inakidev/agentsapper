@@ -6,6 +6,7 @@ import { specs as git003004 } from './git-003-004-drivers.js';
 import { specs as git005 } from './git-005-include.js';
 import { specs as git006 } from './git-006-hooks.js';
 import { specs as git007 } from './git-007-escapes.js';
+import { specs as git008 } from './git-008-embedded.js';
 
 export const ALL_SPECS: readonly FixtureSpec[] = [
   ...benignGit,
@@ -15,4 +16,5 @@ export const ALL_SPECS: readonly FixtureSpec[] = [
   ...git005,
   ...git006,
   ...git007,
+  ...git008,
 ];
