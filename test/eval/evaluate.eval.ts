@@ -153,38 +153,76 @@ function markdown(
 
   const exploitPath = join(outDir, 'exploitability.json');
   if (existsSync(exploitPath)) {
-    const exploit = JSON.parse(readFileSync(exploitPath, 'utf8')) as {
-      run: string;
-      environment: string;
-      results: {
-        spec: string;
-        command: string;
-        cwd: string;
-        note: string;
-        expectedExploit: boolean | string;
-        exploited: boolean;
-        detectedRules: string[];
-        expectedRules: string[];
+    interface ExploitResult {
+      spec: string;
+      command: string;
+      cwd: string;
+      note: string;
+      expectedExploit: boolean | string;
+      exploited: boolean;
+      detectedRules: string[];
+      expectedRules: string[];
+    }
+    const { runs } = JSON.parse(readFileSync(exploitPath, 'utf8')) as {
+      runs: { environment: string; git: string; run: string; results: ExploitResult[] }[];
+    };
+    const first = runs[0];
+    if (first !== undefined) {
+      out.push(
+        '',
+        '## Exploitability of the git fixtures',
+        '',
+        `Each case turns a fixture into a real repository and runs the git command the technique abuses, in throwaway containers: ${runs.map((r) => `${r.environment} ([run](${r.run}))`).join('; ')}. "Ran" means git executed the fixture's inert marker program.`,
+        '',
+        `| Fixture | Command | Expected | ${runs.map((r) => `Ran (git ${r.git})`).join(' | ')} | Detected by agentsapper | Note |`,
+        `|---|---|:---:|${runs.map(() => ':---:').join('|')}|---|---|`,
+      );
+      first.results.forEach((r, i) => {
+        const expected =
+          r.expectedExploit === true
+            ? 'runs'
+            : r.expectedExploit === false
+              ? 'blocked'
+              : 'recorded';
+        const ran = runs.map((run) => (run.results[i]?.exploited === true ? 'yes' : 'no'));
+        const detected = runs.every(
+          (run) => run.results[i]?.detectedRules.length === run.results[i]?.expectedRules.length,
+        )
+          ? `yes (${r.expectedRules.join(', ')})`
+          : 'partial';
+        out.push(
+          `| ${r.spec} | \`${r.command}\`${r.cwd === '.' ? '' : ` in \`${r.cwd}\``} | ${expected} | ${ran.join(' | ')} | ${detected} | ${r.note} |`,
+        );
+      });
+    }
+  }
+
+  const differentialPath = join(outDir, 'differential.json');
+  if (existsSync(differentialPath)) {
+    const { runs } = JSON.parse(readFileSync(differentialPath, 'utf8')) as {
+      runs: {
+        environment: string;
+        git: string;
+        run: string;
+        cases: number;
+        gitAccepted: number;
+        gitRejected: number;
+        agree: number;
+        disagreements: unknown[];
       }[];
     };
     out.push(
       '',
-      '## Exploitability of the git fixtures',
+      '## Git config parser versus git itself',
       '',
-      `Each case turns a fixture into a real repository and runs the git command the technique abuses, in a throwaway container (${exploit.environment}; [run](${exploit.run})). "Ran" means git executed the fixture's inert marker program.`,
+      'Generated configs (fixed seed) with legal and illegal syntax are parsed by agentsapper and by `git config --list --file`. A config git rejects must produce a parse error in agentsapper; a config git accepts must yield the same entries in the same order.',
       '',
-      '| Fixture | Command | Expected | Ran | Detected by agentsapper | Note |',
-      '|---|---|:---:|:---:|---|---|',
+      '| git | Configs | Accepted by git | Rejected by git | Agreement |',
+      '|---|---:|---:|---:|---:|',
     );
-    for (const r of exploit.results) {
-      const expected =
-        r.expectedExploit === true ? 'runs' : r.expectedExploit === false ? 'blocked' : 'recorded';
-      const detected =
-        r.detectedRules.length === r.expectedRules.length
-          ? `yes (${r.detectedRules.join(', ')})`
-          : `partial (${r.detectedRules.join(', ')})`;
+    for (const r of runs) {
       out.push(
-        `| ${r.spec} | \`${r.command}\`${r.cwd === '.' ? '' : ` in \`${r.cwd}\``} | ${expected} | ${r.exploited ? 'yes' : 'no'} | ${detected} | ${r.note} |`,
+        `| [${r.git}](${r.run}) | ${r.cases} | ${r.gitAccepted} | ${r.gitRejected} | ${r.agree}/${r.cases} |`,
       );
     }
   }
