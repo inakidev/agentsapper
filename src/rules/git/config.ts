@@ -6,6 +6,7 @@ import {
 } from '../../parsers/gitconfig.js';
 import { locate, parentOf, type PathPlace } from '../../paths.js';
 import type { ScanContext } from '../../types.js';
+import { readLinked } from '../linked.js';
 import type { GitRepo } from './repos.js';
 
 export interface SourcedEntry extends ConfigEntry {
@@ -39,7 +40,7 @@ export function repoConfig(ctx: ScanContext, repo: GitRepo): RepoConfig {
     const includes: IncludeRef[] = [];
 
     const load = (file: string, conditional: boolean, stack: readonly string[]) => {
-      const text = ctx.readText(file);
+      const text = readLinked(ctx, file);
       if (text === undefined) return;
       for (const entry of parseGitConfig(text).entries) {
         entries.push({ ...entry, file, conditional });

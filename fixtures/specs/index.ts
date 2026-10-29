@@ -11,6 +11,7 @@ import { specs as git007 } from './git-007-escapes.js';
 import { specs as git008 } from './git-008-embedded.js';
 import { specs as idePkg } from './ide-pkg.js';
 import { specs as instrFiles } from './instr-files.js';
+import { specs as linkedConfigs } from './linked-configs.js';
 
 export const ALL_SPECS: readonly FixtureSpec[] = [
   ...benignGit,
@@ -25,4 +26,5 @@ export const ALL_SPECS: readonly FixtureSpec[] = [
   ...agentConfigs,
   ...instrFiles,
   ...idePkg,
+  ...linkedConfigs,
 ];

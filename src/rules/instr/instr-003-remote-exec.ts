@@ -1,4 +1,5 @@
 import type { Finding, Rule } from '../../types.js';
+import { readLinked } from '../linked.js';
 import { clip } from '../util.js';
 import { instructionFiles } from './files.js';
 
@@ -46,7 +47,7 @@ export const INSTR_003: Rule = {
   run(ctx) {
     const findings: Finding[] = [];
     for (const file of instructionFiles(ctx)) {
-      const text = ctx.readText(file.path);
+      const text = readLinked(ctx, file.path);
       if (text === undefined) continue;
       text.split('\n').forEach((row, index) => {
         const hit = PATTERNS.find((p) => p.re.test(row));

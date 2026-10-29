@@ -1,6 +1,7 @@
 import { frontmatterLines } from '../../parsers/frontmatter.js';
 import { isObject, isString } from '../../parsers/jsonc.js';
 import type { Finding, Rule, ScanContext } from '../../types.js';
+import { readLinked } from '../linked.js';
 import { clip } from '../util.js';
 import {
   at,
@@ -200,7 +201,7 @@ function settingsFindings(ctx: ScanContext, file: string): Finding[] {
 }
 
 function frontmatterFindings(ctx: ScanContext, file: string): Finding[] {
-  const lines = frontmatterLines(ctx.readText(file) ?? '');
+  const lines = frontmatterLines(readLinked(ctx, file) ?? '');
   const findings: Finding[] = [];
   const hooks = lines.find((l) => l.key === 'hooks' && l.indent === 0);
   if (hooks !== undefined) {

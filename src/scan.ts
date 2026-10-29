@@ -1,7 +1,8 @@
 import { createContext } from './context.js';
 import { ALL_RULES } from './rules/index.js';
+import { realPath } from './rules/linked.js';
 import { severityRank } from './severity.js';
-import type { Finding, Rule, RuleInfo } from './types.js';
+import type { Finding, Rule, RuleInfo, ScanContext } from './types.js';
 import { compareStrings, DEFAULT_LIMITS, walk, type Limits } from './walker.js';
 
 export interface ScanOptions {
@@ -34,7 +35,7 @@ export function scan(root: string, options: ScanOptions = {}): ScanResult {
 
   for (const rule of rules) {
     try {
-      findings.push(...rule.run(ctx));
+      findings.push(...rule.run(ctx).map((f) => explainLink(ctx, f)));
     } catch (error) {
       errors.push({
         ruleId: rule.id,
@@ -63,6 +64,16 @@ export function scan(root: string, options: ScanOptions = {}): ScanResult {
     ].sort(compareFindings),
     errors,
     incomplete: [...ctx.incomplete],
+  };
+}
+
+/** Findings about content reached through a symlink say where that content really lives. */
+function explainLink(ctx: ScanContext, finding: Finding): Finding {
+  const real = realPath(ctx, finding.file);
+  if (real === undefined || real === finding.file) return finding;
+  return {
+    ...finding,
+    message: `${finding.message} (${finding.file} leads through a symlink to ${real}; line numbers refer to that file.)`,
   };
 }
 

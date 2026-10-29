@@ -6,6 +6,7 @@ import {
 import { baseName, isWithin, locate, parentOf } from '../../paths.js';
 import type { ScanContext } from '../../types.js';
 import { liveEntries, type RepoConfig, type SourcedEntry } from './config.js';
+import { readLinked, realPath } from '../linked.js';
 import type { GitRepo } from './repos.js';
 
 export type DriverAttr = 'filter' | 'diff' | 'merge';
@@ -49,6 +50,8 @@ export interface AttrFile {
   readonly path: string;
   /** Top-level files may define macros. */
   readonly topLevel: boolean;
+  /** git follows links for info/attributes and core.attributesFile, not for .gitattributes. */
+  readonly followLinks: boolean;
 }
 
 /** Attribute files git reads for this repo, as far as they live inside the scan root. */
@@ -59,16 +62,16 @@ export function attributeFiles(
   config: RepoConfig,
 ): AttrFile[] {
   const files: AttrFile[] = [];
-  const isFile = (path: string) => ctx.entry(path)?.kind === 'file';
 
   const info = `${repo.gitDir}/info/attributes`;
-  if (isFile(info)) files.push({ path: info, topLevel: true });
+  if (realPath(ctx, info) !== undefined)
+    files.push({ path: info, topLevel: true, followLinks: true });
 
   for (const entry of liveEntries(config)) {
     if (entry.section !== 'core' || entry.name !== 'attributesfile' || !entry.value) continue;
     const where = locate(ctx, repo.workTree ?? repo.gitDir, entry.value);
-    if (where.kind === 'inside' && isFile(where.path))
-      files.push({ path: where.path, topLevel: true });
+    if (where.kind === 'inside' && realPath(ctx, where.path) !== undefined)
+      files.push({ path: where.path, topLevel: true, followLinks: true });
   }
 
   const workTree = repo.workTree;
@@ -78,7 +81,7 @@ export function attributeFiles(
     const dir = parentOf(entry.path);
     if (!isWithin(dir, workTree) || ownerOf(dir, repos) !== repo) continue;
     if (repos.some((other) => isWithin(entry.path, other.gitDir))) continue;
-    files.push({ path: entry.path, topLevel: dir === workTree });
+    files.push({ path: entry.path, topLevel: dir === workTree, followLinks: false });
   }
   return files;
 }
@@ -116,7 +119,7 @@ const BUILTIN_MACROS: ReadonlyMap<string, readonly AttrAssignment[]> = new Map([
 /** Every place an attribute file assigns filter=, diff= or merge= to a named driver. */
 export function driverUses(ctx: ScanContext, files: readonly AttrFile[]): DriverUse[] {
   const parsed = files.flatMap((file) => {
-    const text = ctx.readText(file.path);
+    const text = file.followLinks ? readLinked(ctx, file.path) : ctx.readText(file.path);
     return text === undefined
       ? []
       : [

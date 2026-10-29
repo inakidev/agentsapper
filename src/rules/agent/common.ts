@@ -1,6 +1,8 @@
 import { isObject, isString, parseJsonc, pointer, type JsoncResult } from '../../parsers/jsonc.js';
 import { parseToml, type ParsedToml } from '../../parsers/toml.js';
+import { compareStrings } from '../../walker.js';
 import type { ScanContext } from '../../types.js';
+import { projectFiles, readLinked } from '../linked.js';
 
 // Vendored dependencies are out of scope (they are not opened by the agent as
 // project config), and git dirs hold no agent config.
@@ -9,23 +11,27 @@ function isProjectPath(path: string): boolean {
   return !segments.includes('node_modules') && !segments.includes('.git');
 }
 
-/** Regular files whose repo-relative path matches `pattern`, sorted. */
+/**
+ * Paths a tool would open that match `pattern`, sorted: regular files, plus paths
+ * that in-repo symlinks lead to a regular file (see rules/linked.ts).
+ */
 export function filesMatching(ctx: ScanContext, pattern: RegExp): string[] {
-  return ctx.entries
-    .filter((e) => e.kind === 'file' && isProjectPath(e.path) && pattern.test(e.path))
-    .map((e) => e.path);
+  return projectFiles(ctx)
+    .map((f) => f.path)
+    .filter((path) => isProjectPath(path) && pattern.test(path))
+    .sort(compareStrings);
 }
 
 export function readJsonc(ctx: ScanContext, path: string): JsoncResult | undefined {
   return ctx.memo(`jsonc:${path}`, () => {
-    const text = ctx.readText(path);
+    const text = readLinked(ctx, path);
     return text === undefined ? undefined : parseJsonc(text);
   });
 }
 
 export function readToml(ctx: ScanContext, path: string): ParsedToml | undefined {
   return ctx.memo(`toml:${path}`, () => {
-    const text = ctx.readText(path);
+    const text = readLinked(ctx, path);
     return text === undefined ? undefined : parseToml(text);
   });
 }
