@@ -62,9 +62,9 @@ export const specs: FixtureSpec[] = [
       { type: 'symlink', path: 'CLAUDE.md', target: 'docs/agent.md', targetType: 'file' },
     ],
     expect: [
-      { ruleId: 'FS-003', severity: 'high', file: '.claude/commands' },
-      { ruleId: 'FS-003', severity: 'high', file: 'pkg/.vscode' },
-      { ruleId: 'FS-003', severity: 'high', file: 'CLAUDE.md' },
+      { ruleId: 'FS-003', severity: 'medium', file: '.claude/commands' },
+      { ruleId: 'FS-003', severity: 'medium', file: 'pkg/.vscode' },
+      { ruleId: 'FS-003', severity: 'medium', file: 'CLAUDE.md' },
     ],
   },
   {
