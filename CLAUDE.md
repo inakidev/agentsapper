@@ -74,3 +74,6 @@ These are set up in F0; keep this list updated if they change.
 - `npm run format` / `npm run format:check`: Prettier
 - `npm run build`: compile to `dist/`
 - `npm run selfscan`: run the built CLI against this repo; must exit 0
+- `npm run corpus:fetch [dir]`: shallow-clone the benign corpus outside the repo (default: OS temp dir)
+- `npm run eval`: fixture detection plus benign-corpus scan; writes `docs/evaluation/RESULTS.md`
+- Exploitability harness (`vitest.exploit.config.ts`): container only, run by the Exploitability workflow; never on the host

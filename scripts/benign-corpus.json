@@ -1,0 +1,85 @@
+{
+  "description": "Popular, legitimate repositories used to measure false positives. They use the features agentsapper inspects (git hooks, prepare scripts, dev containers, agent config) for legitimate reasons.",
+  "repos": [
+    {
+      "name": "husky",
+      "url": "https://github.com/typicode/husky",
+      "why": "git hooks manager; prepare script"
+    },
+    {
+      "name": "express",
+      "url": "https://github.com/expressjs/express",
+      "why": "classic Node project"
+    },
+    {
+      "name": "axios",
+      "url": "https://github.com/axios/axios",
+      "why": "husky hooks, lifecycle scripts"
+    },
+    {
+      "name": "eslint",
+      "url": "https://github.com/eslint/eslint",
+      "why": "large Node project with tooling config"
+    },
+    {
+      "name": "prettier",
+      "url": "https://github.com/prettier/prettier",
+      "why": "VS Code config, lifecycle scripts"
+    },
+    {
+      "name": "vite",
+      "url": "https://github.com/vitejs/vite",
+      "why": "pnpm monorepo, VS Code config"
+    },
+    {
+      "name": "execa",
+      "url": "https://github.com/sindresorhus/execa",
+      "why": "small Node library"
+    },
+    {
+      "name": "devcontainer-templates",
+      "url": "https://github.com/devcontainers/templates",
+      "why": "many devcontainer.json files with lifecycle commands"
+    },
+    {
+      "name": "claude-code",
+      "url": "https://github.com/anthropics/claude-code",
+      "why": "dev container and Claude Code project config"
+    },
+    {
+      "name": "gemini-cli",
+      "url": "https://github.com/google-gemini/gemini-cli",
+      "why": "GEMINI.md and .gemini config"
+    },
+    {
+      "name": "codex",
+      "url": "https://github.com/openai/codex",
+      "why": "AGENTS.md and agent tooling"
+    },
+    {
+      "name": "mcp-servers",
+      "url": "https://github.com/modelcontextprotocol/servers",
+      "why": "MCP servers, npx-based configs in docs"
+    },
+    {
+      "name": "cline",
+      "url": "https://github.com/cline/cline",
+      "why": "agent rules files, VS Code extension config"
+    },
+    {
+      "name": "requests",
+      "url": "https://github.com/psf/requests",
+      "why": "classic Python project"
+    },
+    {
+      "name": "flask",
+      "url": "https://github.com/pallets/flask",
+      "why": "Python project with dev tooling"
+    },
+    {
+      "name": "pydantic",
+      "url": "https://github.com/pydantic/pydantic",
+      "why": "Python project with pre-commit and CI config"
+    }
+  ]
+}
