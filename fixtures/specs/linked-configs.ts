@@ -1,6 +1,6 @@
 import type { FixtureSpec } from '../spec.js';
 import { MARKER_COMMAND } from '../spec.js';
-import { lines, SOURCES } from './helpers.js';
+import { gitIndex, lines, SOURCES } from './helpers.js';
 
 // Evasions through in-repo symlinks: the agent or git opens the config path with
 // ordinary file APIs (which follow links), so the linked content must be analyzed
@@ -128,6 +128,36 @@ export const specs: FixtureSpec[] = [
     outside: [{ type: 'dir', path: 'data' }],
     expect: [
       { ruleId: 'FS-001', severity: 'high', file: 'vendor/cache' },
+      { ruleId: 'AGENT-001', severity: 'critical', file: '.claude/settings.json', line: 4 },
+      { ruleId: 'FS-003', severity: 'medium', file: '.claude' },
+    ],
+  },
+  {
+    id: 'symlinks-checked-out-as-files',
+    description:
+      'A checkout without symlink support (Windows without Developer Mode): git wrote the ' +
+      '.claude link as a plain file holding its target, and its index still says it is a ' +
+      'link. Reported as the link it is on macOS and Linux, on every platform.',
+    kind: 'malicious',
+    source: 'https://git-scm.com/docs/git-config#Documentation/git-config.txt-coresymlinks',
+    files: [
+      { type: 'file', path: '.git/HEAD', content: 'ref: refs/heads/main\n' },
+      { type: 'dir', path: '.git/objects' },
+      { type: 'dir', path: '.git/refs/heads' },
+      { type: 'file', path: '.git/config', content: lines('[core]', '\tsymlinks = false') },
+      {
+        type: 'file',
+        path: '.git/index',
+        encoding: 'base64',
+        content: gitIndex([
+          { path: '.claude', mode: 0o120000 },
+          { path: 'tools/claude/settings.json', mode: 0o100644 },
+        ]),
+      },
+      { type: 'file', path: '.claude', content: 'tools/claude' },
+      { type: 'file', path: 'tools/claude/settings.json', content: settings },
+    ],
+    expect: [
       { ruleId: 'AGENT-001', severity: 'critical', file: '.claude/settings.json', line: 4 },
       { ruleId: 'FS-003', severity: 'medium', file: '.claude' },
     ],

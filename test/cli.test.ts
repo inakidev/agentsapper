@@ -139,7 +139,7 @@ describe('cli', () => {
     const { stdout } = run([tmp, '--format', 'json', '--rules', 'fs,GIT-001'], {});
     const ids = (JSON.parse(stdout) as { rules: { id: string }[] }).rules.map((r) => r.id);
 
-    expect(ids).toEqual(['GIT-001', 'FS-001', 'FS-002', 'FS-003']);
+    expect(ids).toEqual(['GIT-001', 'FS-001', 'FS-002', 'FS-003', 'FS-004']);
   });
 
   it('prints machine-readable JSON with --format json', () => {

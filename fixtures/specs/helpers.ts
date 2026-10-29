@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import type { FixtureEntry } from '../spec.js';
 
 export const SOURCES = {
@@ -19,6 +20,30 @@ export function gitDir(path: string, config: string): FixtureEntry[] {
     { type: 'dir', path: `${path}/objects` },
     { type: 'dir', path: `${path}/refs/heads` },
   ];
+}
+
+/**
+ * A version 2 git index (gitformat-index) listing `entries`, base64-encoded for a
+ * fixture file. Object ids are zero: only paths and modes matter to agentsapper.
+ */
+export function gitIndex(entries: readonly { path: string; mode: number }[]): string {
+  const parts = [Buffer.from('DIRC'), u32(2), u32(entries.length)];
+  for (const { path, mode } of [...entries].sort((a, b) => (a.path < b.path ? -1 : 1))) {
+    const name = Buffer.from(path);
+    const fixed = Buffer.alloc(62); // stat data, mode at 24, 20-byte id, flags at 60
+    fixed.writeUInt32BE(mode, 24);
+    fixed.writeUInt16BE(Math.min(name.length, 0xfff), 60);
+    const size = (62 + name.length + 8) & ~7;
+    parts.push(fixed, name, Buffer.alloc(size - 62 - name.length));
+  }
+  const body = Buffer.concat(parts);
+  return Buffer.concat([body, createHash('sha1').update(body).digest()]).toString('base64');
+}
+
+function u32(value: number): Buffer {
+  const buffer = Buffer.alloc(4);
+  buffer.writeUInt32BE(value);
+  return buffer;
 }
 
 /** Joins lines with LF and a trailing newline, so line numbers are easy to read off. */

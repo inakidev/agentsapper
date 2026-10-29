@@ -55,7 +55,10 @@ function write(base: string, entry: FixtureEntry, fill: (text: string) => string
       mkdirSync(path, { recursive: true });
       break;
     case 'file':
-      writeFileSync(path, fill(entry.content));
+      writeFileSync(
+        path,
+        entry.encoding === 'base64' ? Buffer.from(entry.content, 'base64') : fill(entry.content),
+      );
       if (entry.mode !== undefined) chmodSync(path, entry.mode);
       break;
     case 'symlink':

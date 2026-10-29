@@ -18,6 +18,8 @@ export type FixtureEntry =
       readonly type: 'file';
       readonly path: string;
       readonly content: string;
+      /** `base64` for binary content, such as a git index. Placeholders are not filled in. */
+      readonly encoding?: 'base64';
       readonly mode?: number;
     }
   | { readonly type: 'dir'; readonly path: string }

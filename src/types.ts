@@ -24,6 +24,8 @@ export interface ScanContext {
    * Matched like `entry`.
    */
   readText(path: string): string | undefined;
+  /** Like `readText` for binary files, with their own size cap. */
+  readBytes(path: string, maxBytes: number): Uint8Array | undefined;
   /** Caches a computation shared by several rules for the lifetime of one scan. */
   memo<T>(key: string, compute: () => T): T;
 }

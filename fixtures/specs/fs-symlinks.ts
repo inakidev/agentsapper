@@ -68,6 +68,27 @@ export const specs: FixtureSpec[] = [
     ],
   },
   {
+    id: 'fs-004-planted-programs',
+    description:
+      'Files at the root named like tools agents start by name, which Windows looks up in ' +
+      'the current folder first. The contents are inert text, not programs.',
+    kind: 'malicious',
+    source:
+      'https://learn.microsoft.com/en-us/windows/win32/api/processenv/nf-processenv-needcurrentdirectoryforexepathw',
+    files: [
+      { type: 'file', path: 'git.exe', content: 'not a program\n' },
+      { type: 'file', path: 'rg.cmd', content: 'rem not a program\r\n' },
+      // Not at the root, not a tool name, or not runnable: no findings.
+      { type: 'file', path: 'tools/git.exe', content: 'not a program\n' },
+      { type: 'file', path: 'gitk.exe', content: 'not a program\n' },
+      { type: 'file', path: 'node.txt', content: 'notes\n' },
+    ],
+    expect: [
+      { ruleId: 'FS-004', severity: 'critical', file: 'git.exe' },
+      { ruleId: 'FS-004', severity: 'high', file: 'rg.cmd' },
+    ],
+  },
+  {
     id: 'benign-internal-symlinks',
     description:
       'Ordinary symlinks that stay inside the repo, plus circular and dangling ones: no findings, ' +

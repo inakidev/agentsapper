@@ -12,6 +12,7 @@ import { INSTR_003 } from './instr/instr-003-remote-exec.js';
 import { FS_001 } from './fs/fs-001-outside.js';
 import { FS_002 } from './fs/fs-002-sensitive.js';
 import { FS_003 } from './fs/fs-003-agent-config.js';
+import { FS_004 } from './fs/fs-004-planted-program.js';
 import { GIT_001 } from './git/git-001-fsmonitor.js';
 import { GIT_002 } from './git/git-002-exec-keys.js';
 import { GIT_003 } from './git/git-003-drivers.js';
@@ -34,6 +35,7 @@ export const ALL_RULES: readonly Rule[] = [
   FS_001,
   FS_002,
   FS_003,
+  FS_004,
   AGENT_001,
   AGENT_002,
   AGENT_003,

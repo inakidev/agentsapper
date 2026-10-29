@@ -32,19 +32,23 @@ export function createContext(root: string, walked: WalkResult, limits: Limits):
   const texts = new Map<string, string | undefined>();
   const memos = new Map<string, unknown>();
 
-  const readText = (path: string): string | undefined => {
+  const readBytes = (path: string, maxBytes: number): Uint8Array | undefined => {
     const entry = lookup(path);
-    const real = entry?.path ?? path;
-    if (texts.has(real)) return texts.get(real);
-    let text: string | undefined;
-    if (entry?.kind === 'file') {
-      if (entry.size > limits.maxFileBytes) {
-        incomplete.push(`skipped ${real}: larger than ${limits.maxFileBytes} bytes`);
-      } else {
-        text = readRegularFile(join(root, ...real.split('/')), limits.maxFileBytes);
-        if (text === undefined) incomplete.push(`cannot read ${real}`);
-      }
+    if (entry?.kind !== 'file') return undefined;
+    if (entry.size > maxBytes) {
+      incomplete.push(`skipped ${entry.path}: larger than ${maxBytes} bytes`);
+      return undefined;
     }
+    const bytes = readRegularFile(join(root, ...entry.path.split('/')), maxBytes);
+    if (bytes === undefined) incomplete.push(`cannot read ${entry.path}`);
+    return bytes;
+  };
+
+  const readText = (path: string): string | undefined => {
+    const real = lookup(path)?.path ?? path;
+    if (texts.has(real)) return texts.get(real);
+    const bytes = readBytes(real, limits.maxFileBytes);
+    const text = bytes === undefined ? undefined : new TextDecoder('utf-8').decode(bytes);
     texts.set(real, text);
     return text;
   };
@@ -56,6 +60,7 @@ export function createContext(root: string, walked: WalkResult, limits: Limits):
     entry: lookup,
     children: (path) => byParent.get(path) ?? byParent.get(lookup(path)?.path ?? path) ?? [],
     readText,
+    readBytes,
     memo: <T>(key: string, compute: () => T): T => {
       if (!memos.has(key)) memos.set(key, compute());
       return memos.get(key) as T;
@@ -63,7 +68,7 @@ export function createContext(root: string, walked: WalkResult, limits: Limits):
   };
 }
 
-function readRegularFile(abs: string, maxBytes: number): string | undefined {
+function readRegularFile(abs: string, maxBytes: number): Uint8Array | undefined {
   let fd: number | undefined;
   try {
     fd = openSync(abs, OPEN_FLAGS);
@@ -76,7 +81,7 @@ function readRegularFile(abs: string, maxBytes: number): string | undefined {
       if (read === 0) break;
       offset += read;
     }
-    return new TextDecoder('utf-8').decode(buffer.subarray(0, offset));
+    return buffer.subarray(0, offset);
   } catch {
     return undefined;
   } finally {

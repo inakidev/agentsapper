@@ -1,5 +1,7 @@
 import { homedir } from 'node:os';
 import { foldName, sameName } from '../../names.js';
+import { parseGitConfig } from '../../parsers/gitconfig.js';
+import { isSymlinkMode, parseGitIndex } from '../../parsers/gitindex.js';
 import { absPath, baseName, parentOf, relInside, resolveLinkTarget } from '../../paths.js';
 import type { Finding, ScanContext } from '../../types.js';
 import type { Entry } from '../../walker.js';
@@ -165,9 +167,41 @@ function inAgentConfig(path: string): boolean {
   );
 }
 
+/** Larger index files are not read, and make the scan incomplete. */
+const MAX_INDEX_BYTES = 64 * 1024 * 1024;
+/** PATH_MAX: a placeholder holding a longer target is not git's. */
+const MAX_LINK_TEXT = 4096;
+
+/**
+ * Symlinks that git checked out as plain files holding the link text, as it does on
+ * Windows without symlink support (core.symlinks false). git's index still records
+ * them as links, so they are analyzed as the links they are on macOS and Linux. The
+ * file itself stays a regular file for every other rule, so an index that lies about
+ * a path cannot hide its content. Root repository only.
+ */
+export function checkedOutAsFiles(ctx: ScanContext): Entry[] {
+  return ctx.memo('fs:index-links', () => {
+    if (ctx.entry('.git')?.kind !== 'dir') return [];
+    const bytes = ctx.readBytes('.git/index', MAX_INDEX_BYTES);
+    if (bytes === undefined) return [];
+    const format = parseGitConfig(ctx.readText('.git/config') ?? '').entries.find(
+      (e) => e.section === 'extensions' && e.name === 'objectformat',
+    )?.value;
+    const index = parseGitIndex(bytes, format?.toLowerCase() === 'sha256' ? 32 : 20) ?? [];
+    return index.flatMap((tracked) => {
+      if (!isSymlinkMode(tracked.mode)) return [];
+      const file = ctx.entry(tracked.path);
+      if (file?.kind !== 'file' || file.size === 0 || file.size > MAX_LINK_TEXT) return [];
+      const text = ctx.readText(file.path);
+      if (text === undefined || text.includes('\0')) return [];
+      return [{ ...file, kind: 'symlink' as const, linkTarget: text }];
+    });
+  });
+}
+
 export function classifyLinks(ctx: ScanContext): LinkInfo[] {
   return ctx.memo('fs:links', () =>
-    ctx.entries.flatMap((entry) => {
+    [...ctx.entries, ...checkedOutAsFiles(ctx)].flatMap((entry) => {
       // A .git symlink is a git dir pointer; GIT-007 reports it with that context.
       if (entry.kind !== 'symlink' || sameName(baseName(entry.path), '.git')) return [];
       const text = entry.linkTarget ?? '';
