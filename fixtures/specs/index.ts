@@ -9,6 +9,7 @@ import { specs as git005 } from './git-005-include.js';
 import { specs as git006 } from './git-006-hooks.js';
 import { specs as git007 } from './git-007-escapes.js';
 import { specs as git008 } from './git-008-embedded.js';
+import { specs as instrFiles } from './instr-files.js';
 
 export const ALL_SPECS: readonly FixtureSpec[] = [
   ...benignGit,
@@ -21,4 +22,5 @@ export const ALL_SPECS: readonly FixtureSpec[] = [
   ...git008,
   ...fsSymlinks,
   ...agentConfigs,
+  ...instrFiles,
 ];

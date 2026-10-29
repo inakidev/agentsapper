@@ -3,6 +3,9 @@ import { AGENT_001 } from './agent/agent-001-claude-code.js';
 import { AGENT_002 } from './agent/agent-002-mcp.js';
 import { AGENT_003 } from './agent/agent-003-other-hooks.js';
 import { AGENT_004 } from './agent/agent-004-auto-approve.js';
+import { INSTR_001 } from './instr/instr-001-invisible.js';
+import { INSTR_002 } from './instr/instr-002-hidden-blocks.js';
+import { INSTR_003 } from './instr/instr-003-remote-exec.js';
 import { FS_001 } from './fs/fs-001-outside.js';
 import { FS_002 } from './fs/fs-002-sensitive.js';
 import { FS_003 } from './fs/fs-003-agent-config.js';
@@ -32,4 +35,7 @@ export const ALL_RULES: readonly Rule[] = [
   AGENT_002,
   AGENT_003,
   AGENT_004,
+  INSTR_001,
+  INSTR_002,
+  INSTR_003,
 ];
