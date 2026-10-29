@@ -42,9 +42,13 @@ src/
 fixtures/
   specs/              # fixture definitions (data only, never live repos)
   materialize.ts      # writes a spec into a temp dir for tests
+scripts/              # benign corpus list and fetcher (clones outside the repo)
 test/
+  exploit/            # exploitability harness: container only, never on the host
+  eval/               # evaluation run that writes docs/evaluation/
 docs/
   PROJECT_BRIEF.md
+  evaluation/         # RESULTS.md, results.json, exploitability.json
 ```
 
 ## Rule contract
