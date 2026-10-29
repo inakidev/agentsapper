@@ -1,3 +1,4 @@
+import { foldName, sameName } from '../../names.js';
 import { baseName, isWithin, locate, parentOf, type PathPlace } from '../../paths.js';
 import type { ScanContext } from '../../types.js';
 import { compareStrings } from '../../walker.js';
@@ -47,9 +48,9 @@ function discover(ctx: ScanContext): RepoScan {
   };
 
   for (const entry of ctx.entries) {
-    if (baseName(entry.path) !== '.git') continue;
+    if (!sameName(baseName(entry.path), '.git')) continue;
     const parent = parentOf(entry.path);
-    if (parent.split('/').includes('.git')) continue;
+    if (parent.split('/').some((segment) => sameName(segment, '.git'))) continue;
     const kind = parent === '' ? 'root' : 'nested';
 
     if (entry.kind === 'dir') {
@@ -74,12 +75,13 @@ function discover(ctx: ScanContext): RepoScan {
     if (target === undefined || target === '') continue;
 
     const where = locate(ctx, parent, target);
+    const dir = where.kind === 'inside' ? ctx.entry(where.path) : undefined;
     if (where.kind !== 'inside') {
       escapes.push({ file: entry.path, ...(line === undefined ? {} : { line }), evidence, where });
-    } else if (ctx.entry(where.path)?.kind === 'dir') {
-      const intoModules = /(^|\/)\.git\/modules\//.test(where.path);
+    } else if (dir?.kind === 'dir') {
+      const intoModules = /(^|\/)\.git\/modules\//.test(foldName(dir.path));
       add({
-        gitDir: where.path,
+        gitDir: dir.path,
         workTree: parent,
         kind: intoModules ? 'submodule' : kind,
         marker: entry.path,
@@ -91,11 +93,11 @@ function discover(ctx: ScanContext): RepoScan {
   for (const entry of ctx.entries) {
     if (entry.kind !== 'dir' || gitDirs.has(entry.path) || !looksLikeGitDir(ctx, entry.path))
       continue;
-    if (baseName(entry.path) === '.git') continue;
+    if (sameName(baseName(entry.path), '.git')) continue;
     const container = [...gitDirs].find((dir) => isWithin(entry.path, dir));
     if (container === undefined) {
       add({ gitDir: entry.path, kind: 'bare', marker: entry.path });
-    } else if (entry.path.startsWith(`${container}/modules/`)) {
+    } else if (foldName(entry.path).startsWith(foldName(`${container}/modules/`))) {
       add({ gitDir: entry.path, kind: 'submodule', marker: entry.path });
     }
   }

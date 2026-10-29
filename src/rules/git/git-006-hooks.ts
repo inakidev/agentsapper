@@ -1,3 +1,4 @@
+import { foldName } from '../../names.js';
 import { configKey } from '../../parsers/gitconfig.js';
 import { baseName, locate } from '../../paths.js';
 import type { Finding, Rule, ScanContext } from '../../types.js';
@@ -51,8 +52,9 @@ export const GIT_006: Rule = {
     const seen = new Set<string>();
     const report = (dir: string) => {
       for (const entry of ctx.children(dir)) {
-        const name = baseName(entry.path);
-        const trigger = HOOKS[name];
+        // git opens hooks by name, so on Windows and macOS PRE-COMMIT runs as pre-commit.
+        const name = foldName(baseName(entry.path));
+        const trigger = Object.hasOwn(HOOKS, name) ? HOOKS[name] : undefined;
         if (trigger === undefined || seen.has(entry.path)) continue;
         seen.add(entry.path);
         const finding = hookFinding(ctx, entry, name, trigger);

@@ -1,3 +1,4 @@
+import { foldName } from '../../names.js';
 import { isObject, isString, parseJsonc, pointer, type JsoncResult } from '../../parsers/jsonc.js';
 import { parseToml, type ParsedToml } from '../../parsers/toml.js';
 import { compareStrings } from '../../walker.js';
@@ -6,19 +7,32 @@ import { projectFiles, readLinked } from '../linked.js';
 
 // Vendored dependencies are out of scope (they are not opened by the agent as
 // project config), and git dirs hold no agent config.
-function isProjectPath(path: string): boolean {
-  const segments = path.split('/');
+function isProjectPath(folded: string): boolean {
+  const segments = folded.split('/');
   return !segments.includes('node_modules') && !segments.includes('.git');
+}
+
+/** Project paths with their folded form (names.ts), computed once per scan. */
+function foldedProjectPaths(ctx: ScanContext): readonly (readonly [string, string])[] {
+  return ctx.memo('agent:folded-paths', () =>
+    projectFiles(ctx)
+      .map((f) => [f.path, foldName(f.path)] as const)
+      .filter(([, folded]) => isProjectPath(folded)),
+  );
 }
 
 /**
  * Paths a tool would open that match `pattern`, sorted: regular files, plus paths
- * that in-repo symlinks lead to a regular file (see rules/linked.ts).
+ * that in-repo symlinks lead to a regular file (see rules/linked.ts). Matching
+ * ignores case, as on Windows and macOS: `.Claude/Settings.json` matches too.
  */
 export function filesMatching(ctx: ScanContext, pattern: RegExp): string[] {
-  return projectFiles(ctx)
-    .map((f) => f.path)
-    .filter((path) => isProjectPath(path) && pattern.test(path))
+  const insensitive = pattern.ignoreCase
+    ? pattern
+    : new RegExp(pattern.source, `${pattern.flags}i`);
+  return foldedProjectPaths(ctx)
+    .filter(([, folded]) => insensitive.test(folded))
+    .map(([path]) => path)
     .sort(compareStrings);
 }
 

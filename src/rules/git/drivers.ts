@@ -3,10 +3,11 @@ import {
   type AttrAssignment,
   type AttrLine,
 } from '../../parsers/gitattributes.js';
+import { sameName } from '../../names.js';
 import { baseName, isWithin, locate, parentOf } from '../../paths.js';
 import type { ScanContext } from '../../types.js';
 import { liveEntries, type RepoConfig, type SourcedEntry } from './config.js';
-import { readLinked, realPath } from '../linked.js';
+import { readLinked, realPath, spelledPath } from '../linked.js';
 import type { GitRepo } from './repos.js';
 
 export type DriverAttr = 'filter' | 'diff' | 'merge';
@@ -65,19 +66,19 @@ export function attributeFiles(
 
   const info = `${repo.gitDir}/info/attributes`;
   if (realPath(ctx, info) !== undefined)
-    files.push({ path: info, topLevel: true, followLinks: true });
+    files.push({ path: spelledPath(ctx, info), topLevel: true, followLinks: true });
 
   for (const entry of liveEntries(config)) {
     if (entry.section !== 'core' || entry.name !== 'attributesfile' || !entry.value) continue;
     const where = locate(ctx, repo.workTree ?? repo.gitDir, entry.value);
     if (where.kind === 'inside' && realPath(ctx, where.path) !== undefined)
-      files.push({ path: where.path, topLevel: true, followLinks: true });
+      files.push({ path: spelledPath(ctx, where.path), topLevel: true, followLinks: true });
   }
 
   const workTree = repo.workTree;
   if (workTree === undefined) return files;
   for (const entry of ctx.entries) {
-    if (entry.kind !== 'file' || baseName(entry.path) !== '.gitattributes') continue;
+    if (entry.kind !== 'file' || !sameName(baseName(entry.path), '.gitattributes')) continue;
     const dir = parentOf(entry.path);
     if (!isWithin(dir, workTree) || ownerOf(dir, repos) !== repo) continue;
     if (repos.some((other) => isWithin(entry.path, other.gitDir))) continue;

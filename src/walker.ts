@@ -1,5 +1,6 @@
 import { lstatSync, opendirSync, readlinkSync, type Stats } from 'node:fs';
 import { join } from 'node:path';
+import { foldName } from './names.js';
 
 export type EntryKind = 'file' | 'dir' | 'symlink' | 'other';
 
@@ -68,10 +69,10 @@ export function walk(
       incomplete.push(`cannot read directory ${dir.rel || '.'}`);
       continue;
     }
+    const folded = names.map(foldName);
     const isGitDir =
-      dir.rel === '.git' ||
-      dir.rel.endsWith('/.git') ||
-      ['HEAD', 'objects', 'refs'].every((name) => names.includes(name));
+      foldName(dir.rel.slice(dir.rel.lastIndexOf('/') + 1)) === '.git' ||
+      ['head', 'objects', 'refs'].every((name) => folded.includes(name));
 
     for (const name of names) {
       if (clock() > deadline) {
@@ -102,7 +103,7 @@ export function walk(
         ...(kind === 'symlink' ? { linkTarget: readLink(abs) } : {}),
       });
 
-      if (kind !== 'dir' || (isGitDir && GIT_STORAGE_DIRS.has(name))) continue;
+      if (kind !== 'dir' || (isGitDir && GIT_STORAGE_DIRS.has(foldName(name)))) continue;
       const depth = dir.depth + 1;
       if (depth >= limits.maxDepth) {
         incomplete.push(`depth limit of ${limits.maxDepth} reached at ${rel}`);

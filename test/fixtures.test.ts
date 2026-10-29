@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { materialize, type MaterializedFixture } from '../fixtures/materialize.js';
 import type { ExpectedFinding, FixtureSpec } from '../fixtures/spec.js';
 import { ALL_SPECS } from '../fixtures/specs/index.js';
+import { foldName } from '../src/names.js';
 import { ALL_RULES } from '../src/rules/index.js';
 import { scan } from '../src/scan.js';
 
@@ -46,6 +47,46 @@ describe.each(ALL_SPECS.map((spec) => [spec.id, spec] as const))('fixture %s', (
     }
   });
 });
+
+// On case-insensitive filesystems (Windows, macOS by default) a tool that opens
+// .claude/settings.json also gets .CLAUDE/SETTINGS.JSON, so respelling paths must not
+// hide anything. File contents and link targets keep their spelling, so lookups through
+// config values (include.path, gitdir:) and links are exercised too.
+function respelled(spec: FixtureSpec): FixtureSpec {
+  return {
+    ...spec,
+    files: spec.files.map((entry) => ({ ...entry, path: entry.path.toUpperCase() })),
+  };
+}
+
+describe.each(ALL_SPECS.map((spec) => [spec.id, spec] as const))(
+  'fixture %s with its paths in upper case',
+  (_id, spec) => {
+    it('produces the same findings, up to the spelling of paths', (ctx) => {
+      const paths = respelled(spec).files.map((entry) => entry.path);
+      if (new Set(paths).size < paths.length) ctx.skip('its paths collide once respelled');
+      const fixture = materializeOrSkip(respelled(spec), (note) => ctx.skip(note));
+      try {
+        const result = scan(fixture.root);
+
+        expect(result.errors).toEqual([]);
+        expect(result.incomplete).toEqual([]);
+        const folded = (f: ExpectedFinding) => ({ ...f, file: foldName(f.file) });
+        const expected = spec.expect.map(folded);
+        const actual = result.findings.map((f) => {
+          const anyLine = expected.some(
+            (e) => e.line === undefined && e.file === foldName(f.file) && e.ruleId === f.ruleId,
+          );
+          const g = folded(f);
+          return signature(anyLine ? { ruleId: g.ruleId, severity: g.severity, file: g.file } : g);
+        });
+        expect(actual.sort()).toEqual(expected.map(signature).sort());
+      } finally {
+        fixture.cleanup();
+      }
+    });
+  },
+);
 
 describe('fixture catalog', () => {
   it('has unique ids', () => {

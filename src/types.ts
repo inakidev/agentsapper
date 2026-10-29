@@ -11,12 +11,17 @@ export interface ScanContext {
   readonly entries: readonly Entry[];
   /** Reasons the scan may have missed something. Non-empty means incomplete. */
   readonly incomplete: readonly string[];
+  /**
+   * The entry at `path`. Without an exact match, the entry a case-insensitive
+   * filesystem would open for it (names.ts); its `path` is the real spelling.
+   */
   entry(path: string): Entry | undefined;
-  /** Direct children of a directory (`''` is the root), sorted by path. */
+  /** Direct children of a directory (`''` is the root), sorted by path. Matched like `entry`. */
   children(path: string): readonly Entry[];
   /**
    * Contents of a regular file as UTF-8, or undefined for anything else
    * (missing, directory, symlink, too large). Never reads through a symlink.
+   * Matched like `entry`.
    */
   readText(path: string): string | undefined;
   /** Caches a computation shared by several rules for the lifetime of one scan. */

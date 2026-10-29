@@ -1,4 +1,5 @@
 import { homedir } from 'node:os';
+import { foldName, sameName } from '../../names.js';
 import { absPath, baseName, parentOf, relInside, resolveLinkTarget } from '../../paths.js';
 import type { Finding, ScanContext } from '../../types.js';
 import type { Entry } from '../../walker.js';
@@ -51,8 +52,8 @@ export interface LinkInfo {
   readonly inAgentConfig: boolean;
 }
 
-/** Directories agents and IDEs load config, rules, commands or tasks from. */
-export const AGENT_CONFIG_DIRS = new Set([
+/** Directories agents and IDEs load config, rules, commands or tasks from. Look up folded names. */
+export const AGENT_CONFIG_DIRS: ReadonlySet<string> = new Set([
   '.claude',
   '.cursor',
   '.vscode',
@@ -65,17 +66,19 @@ export const AGENT_CONFIG_DIRS = new Set([
   '.continue',
 ]);
 
-/** Files agents read as instructions or config wherever they appear. */
-export const AGENT_CONFIG_FILES = new Set([
-  'CLAUDE.md',
-  'CLAUDE.local.md',
-  'AGENTS.md',
-  'GEMINI.md',
-  '.cursorrules',
-  '.windsurfrules',
-  '.clinerules',
-  '.mcp.json',
-]);
+/** Files agents read as instructions or config wherever they appear. Look up folded names. */
+export const AGENT_CONFIG_FILES: ReadonlySet<string> = new Set(
+  [
+    'CLAUDE.md',
+    'CLAUDE.local.md',
+    'AGENTS.md',
+    'GEMINI.md',
+    '.cursorrules',
+    '.windsurfrules',
+    '.clinerules',
+    '.mcp.json',
+  ].map(foldName),
+);
 
 // Below a home directory: credentials, shell startup files and agent configs.
 const HOME_SENSITIVE = [
@@ -117,12 +120,13 @@ const SYSTEM_SENSITIVE = [
 const GENERIC_HOME = /^\/(home|users)\/[^/]+(\/(.*))?$/;
 
 function normalize(abs: string): string {
-  return abs
-    .replaceAll('\\', '/')
-    .replace(/^\/\/\?\//, '')
-    .replace(/^[a-z]:/i, '')
-    .replace(/\/+$/, '')
-    .toLowerCase();
+  return foldName(
+    abs
+      .replaceAll('\\', '/')
+      .replace(/^\/\/\?\//, '')
+      .replace(/^[a-z]:/i, '')
+      .replace(/\/+$/, ''),
+  );
 }
 
 // Windows keeps the user's temp dir under AppData; links there are merely "outside".
@@ -156,8 +160,8 @@ function classify(ctx: ScanContext, linkPath: string, text: string): LinkClass {
 
 function inAgentConfig(path: string): boolean {
   return (
-    path.split('/').some((segment) => AGENT_CONFIG_DIRS.has(segment)) ||
-    AGENT_CONFIG_FILES.has(baseName(path))
+    path.split('/').some((segment) => AGENT_CONFIG_DIRS.has(foldName(segment))) ||
+    AGENT_CONFIG_FILES.has(foldName(baseName(path)))
   );
 }
 
@@ -165,7 +169,7 @@ export function classifyLinks(ctx: ScanContext): LinkInfo[] {
   return ctx.memo('fs:links', () =>
     ctx.entries.flatMap((entry) => {
       // A .git symlink is a git dir pointer; GIT-007 reports it with that context.
-      if (entry.kind !== 'symlink' || baseName(entry.path) === '.git') return [];
+      if (entry.kind !== 'symlink' || sameName(baseName(entry.path), '.git')) return [];
       const text = entry.linkTarget ?? '';
       if (text === '') return [];
       return [

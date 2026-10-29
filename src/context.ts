@@ -1,5 +1,6 @@
 import { closeSync, constants, fstatSync, openSync, readSync } from 'node:fs';
 import { join } from 'node:path';
+import { foldName } from './names.js';
 import type { ScanContext } from './types.js';
 import type { Entry, Limits, WalkResult } from './walker.js';
 
@@ -9,9 +10,14 @@ const OPEN_FLAGS = constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0) | (constants
 
 export function createContext(root: string, walked: WalkResult, limits: Limits): ScanContext {
   const byPath = new Map<string, Entry>();
+  // Spelled differently but the same file on a case-insensitive filesystem (names.ts).
+  // Entries are sorted, so the first spelling wins when a case-sensitive one holds several.
+  const byFolded = new Map<string, Entry>();
   const byParent = new Map<string, Entry[]>();
   for (const entry of walked.entries) {
     byPath.set(entry.path, entry);
+    const folded = foldName(entry.path);
+    if (!byFolded.has(folded)) byFolded.set(folded, entry);
     const slash = entry.path.lastIndexOf('/');
     const parent = slash === -1 ? '' : entry.path.slice(0, slash);
     const siblings = byParent.get(parent);
@@ -19,23 +25,27 @@ export function createContext(root: string, walked: WalkResult, limits: Limits):
     else siblings.push(entry);
   }
 
+  const lookup = (path: string): Entry | undefined =>
+    byPath.get(path) ?? byFolded.get(foldName(path));
+
   const incomplete = [...walked.incomplete];
   const texts = new Map<string, string | undefined>();
   const memos = new Map<string, unknown>();
 
   const readText = (path: string): string | undefined => {
-    if (texts.has(path)) return texts.get(path);
-    const entry = byPath.get(path);
+    const entry = lookup(path);
+    const real = entry?.path ?? path;
+    if (texts.has(real)) return texts.get(real);
     let text: string | undefined;
     if (entry?.kind === 'file') {
       if (entry.size > limits.maxFileBytes) {
-        incomplete.push(`skipped ${path}: larger than ${limits.maxFileBytes} bytes`);
+        incomplete.push(`skipped ${real}: larger than ${limits.maxFileBytes} bytes`);
       } else {
-        text = readRegularFile(join(root, ...path.split('/')), limits.maxFileBytes);
-        if (text === undefined) incomplete.push(`cannot read ${path}`);
+        text = readRegularFile(join(root, ...real.split('/')), limits.maxFileBytes);
+        if (text === undefined) incomplete.push(`cannot read ${real}`);
       }
     }
-    texts.set(path, text);
+    texts.set(real, text);
     return text;
   };
 
@@ -43,8 +53,8 @@ export function createContext(root: string, walked: WalkResult, limits: Limits):
     root,
     entries: walked.entries,
     incomplete,
-    entry: (path) => byPath.get(path),
-    children: (path) => byParent.get(path) ?? [],
+    entry: lookup,
+    children: (path) => byParent.get(path) ?? byParent.get(lookup(path)?.path ?? path) ?? [],
     readText,
     memo: <T>(key: string, compute: () => T): T => {
       if (!memos.has(key)) memos.set(key, compute());

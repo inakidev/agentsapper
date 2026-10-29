@@ -6,7 +6,7 @@ import {
 } from '../../parsers/gitconfig.js';
 import { locate, parentOf, type PathPlace } from '../../paths.js';
 import type { ScanContext } from '../../types.js';
-import { readLinked } from '../linked.js';
+import { readLinked, spelledPath } from '../linked.js';
 import type { GitRepo } from './repos.js';
 
 export interface SourcedEntry extends ConfigEntry {
@@ -39,7 +39,8 @@ export function repoConfig(ctx: ScanContext, repo: GitRepo): RepoConfig {
     const entries: SourcedEntry[] = [];
     const includes: IncludeRef[] = [];
 
-    const load = (file: string, conditional: boolean, stack: readonly string[]) => {
+    const load = (asked: string, conditional: boolean, stack: readonly string[]) => {
+      const file = spelledPath(ctx, asked);
       const text = readLinked(ctx, file);
       if (text === undefined) return;
       for (const entry of parseGitConfig(text).entries) {
@@ -47,7 +48,8 @@ export function repoConfig(ctx: ScanContext, repo: GitRepo): RepoConfig {
         if (!isInclude(entry) || entry.value === null || entry.value === '') continue;
 
         const where = locate(ctx, parentOf(file), entry.value);
-        const exists = where.kind === 'inside' && ctx.entry(where.path)?.kind === 'file';
+        const target = where.kind === 'inside' ? ctx.entry(where.path) : undefined;
+        const exists = target?.kind === 'file';
         includes.push({
           file,
           line: entry.line,
@@ -56,16 +58,16 @@ export function repoConfig(ctx: ScanContext, repo: GitRepo): RepoConfig {
           where,
           exists,
         });
-        if (exists && stack.length < MAX_INCLUDE_DEPTH && !stack.includes(where.path)) {
-          load(where.path, conditional || entry.section === 'includeif', [...stack, where.path]);
+        if (exists && stack.length < MAX_INCLUDE_DEPTH && !stack.includes(target.path)) {
+          load(target.path, conditional || entry.section === 'includeif', [...stack, target.path]);
         }
       }
     };
 
-    const main = `${repo.gitDir}/config`;
+    const main = spelledPath(ctx, `${repo.gitDir}/config`);
     load(main, false, [main]);
     // config.worktree is only read when the repo opts in, and it overrides the main config.
-    const worktree = `${repo.gitDir}/config.worktree`;
+    const worktree = spelledPath(ctx, `${repo.gitDir}/config.worktree`);
     if (liveBool({ entries, includes }, 'extensions.worktreeconfig'))
       load(worktree, false, [worktree]);
     return { entries, includes };
