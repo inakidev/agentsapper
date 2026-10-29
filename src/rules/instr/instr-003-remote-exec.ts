@@ -1,3 +1,4 @@
+import type { Severity } from '../../severity.js';
 import type { Finding, Rule } from '../../types.js';
 import { readLinked } from '../linked.js';
 import { clip } from '../util.js';
@@ -8,32 +9,6 @@ import { instructionFiles } from './files.js';
 
 const DOWNLOAD_PIPE =
   /\b(?:curl|wget|iwr|irm|Invoke-WebRequest|Invoke-RestMethod)\b[^\n|]{0,300}\|\s*(?:sudo\s+)?(sh|bash|zsh|dash|ksh|python3?|node|perl|ruby|iex|Invoke-Expression|pwsh|powershell)\b([^\n]*)/i;
-
-/**
- * True when the interpreter runs the download as its program: `| sh`, `| python3 -`,
- * `| bash -s -- args`. False when the download is only input data for inline code or a
- * script file (`| python3 -c "..."`, `| node -e ...`, `| python3 tools/parse.py`), which
- * is common in docs (found in cline/cline by the benign-corpus evaluation).
- */
-export function pipesDownloadIntoInterpreter(row: string): boolean {
-  const match = DOWNLOAD_PIPE.exec(row);
-  if (match === null) return false;
-  const interpreter = (match[1] ?? '').toLowerCase();
-  if (/^(iex|invoke-expression|pwsh|powershell)$/.test(interpreter)) return true;
-  const inline = INLINE_CODE_FLAG[interpreter.replace(/3$/, '')];
-  const args =
-    (match[2] ?? '')
-      .split(/[|;&)`]/)[0]
-      ?.trim()
-      .split(/\s+/) ?? [];
-  for (const arg of args) {
-    if (arg === '' || arg === '-' || arg === '--' || arg.startsWith('-s')) return true;
-    if (inline?.test(arg) === true) return false; // inline code or a module: the download is data
-    if (arg.startsWith('-')) continue; // other interpreter flags
-    return !/^[\w./~$]/.test(arg); // a script path: the download is its input
-  }
-  return true;
-}
 
 /** Flags that make the interpreter run code given on the command line instead of stdin. */
 const INLINE_CODE_FLAG: Readonly<Record<string, RegExp>> = {
@@ -48,11 +23,41 @@ const INLINE_CODE_FLAG: Readonly<Record<string, RegExp>> = {
   ruby: /^-[a-zA-Z]*e/,
 };
 
-const PATTERNS: readonly { re: { test(row: string): boolean }; what: string }[] = [
-  {
-    re: { test: pipesDownloadIntoInterpreter },
-    what: 'pipes a download straight into an interpreter',
-  },
+/** Inline code that runs what it reads: exec(sys.stdin.read()), eval(...), new Function(...). */
+const EXECUTES_INPUT =
+  /\b(exec|eval|execfile|compile|runpy|Function|system|popen|spawn|execSync|instance_eval)\s*\(|\bvm\.run|\bsubprocess\b|\bchild_process\b|\beval\b/;
+
+export type DownloadPipe =
+  /** The interpreter runs the download as its program: `| sh`, `| python3 -`, `| bash -s`. */
+  | 'program'
+  /** The download goes to inline code that appears to execute it. */
+  | 'inline-exec'
+  /** The download is input data for inline code or a script file. */
+  | 'data';
+
+/**
+ * Classifies `curl ... | interpreter` lines. Whether inline code executes its input
+ * is undecidable in general, so data pipes are still reported, at low severity
+ * (benign example: cline/cline; evasive example: `| python3 -c "exec(sys.stdin.read())"`).
+ */
+export function classifyDownloadPipe(row: string): DownloadPipe | undefined {
+  const match = DOWNLOAD_PIPE.exec(row);
+  if (match === null) return undefined;
+  const interpreter = (match[1] ?? '').toLowerCase();
+  if (/^(iex|invoke-expression|pwsh|powershell)$/.test(interpreter)) return 'program';
+  const inline = INLINE_CODE_FLAG[interpreter.replace(/3$/, '')];
+  const command = (match[2] ?? '').split(/[|;&)`]/)[0]?.trim() ?? '';
+  for (const arg of command.split(/\s+/)) {
+    if (arg === '' || arg === '-' || arg === '--' || arg.startsWith('-s')) return 'program';
+    if (inline?.test(arg) === true)
+      return EXECUTES_INPUT.test(match[2] ?? '') ? 'inline-exec' : 'data';
+    if (arg.startsWith('-')) continue; // other interpreter flags
+    return /^[\w./~$]/.test(arg) ? 'data' : 'program'; // a script path reads the download as input
+  }
+  return 'program';
+}
+
+const PATTERNS: readonly { re: RegExp; what: string }[] = [
   {
     re: /\b(bash|sh|zsh|source)\s+<\(\s*(curl|wget)\b/i,
     what: 'runs a downloaded script through process substitution',
@@ -77,6 +82,34 @@ const PATTERNS: readonly { re: { test(row: string): boolean }; what: string }[] 
 const BLOB = /[A-Za-z0-9+/]{200,}={0,2}/;
 const looksEncoded = (s: string) => /[a-z]/.test(s) && /[A-Z]/.test(s) && /[0-9]/.test(s);
 
+interface Hit {
+  readonly what: string;
+  /** Data pipes are a weaker signal than code that clearly runs the download. */
+  readonly weak: boolean;
+}
+
+function inspect(row: string): Hit | undefined {
+  const pipe = classifyDownloadPipe(row);
+  if (pipe === 'program')
+    return { what: 'pipes a download straight into an interpreter', weak: false };
+  if (pipe === 'inline-exec') {
+    return { what: 'pipes a download into inline code that appears to execute it', weak: false };
+  }
+  const pattern = PATTERNS.find((p) => p.re.test(row));
+  if (pattern !== undefined) return { what: pattern.what, weak: false };
+  const blob = BLOB.exec(row)?.[0];
+  if (blob !== undefined && looksEncoded(blob)) {
+    return { what: `contains a ${blob.length}-character base64 blob`, weak: false };
+  }
+  if (pipe === 'data') {
+    return {
+      what: 'pipes a download into inline code or a script as input; that code could still run what it reads',
+      weak: true,
+    };
+  }
+  return undefined;
+}
+
 export const INSTR_003: Rule = {
   id: 'INSTR-003',
   title: 'Instruction file asks to download and run code, or carries an encoded payload',
@@ -92,18 +125,23 @@ export const INSTR_003: Rule = {
       const text = readLinked(ctx, file.path);
       if (text === undefined) continue;
       text.split('\n').forEach((row, index) => {
-        const hit = PATTERNS.find((p) => p.re.test(row));
-        const blob = BLOB.exec(row)?.[0];
-        if (hit === undefined && (blob === undefined || !looksEncoded(blob))) return;
-        const what = hit?.what ?? `contains a ${blob?.length ?? 0}-character base64 blob`;
+        const hit = inspect(row);
+        if (hit === undefined) return;
+        const severity: Severity = hit.weak
+          ? file.readme
+            ? 'info'
+            : 'low'
+          : file.readme
+            ? 'low'
+            : 'high';
         findings.push({
           ruleId: 'INSTR-003',
-          severity: file.readme ? 'low' : 'high',
+          severity,
           file: file.path,
           line: index + 1,
           evidence: clip(row.trim(), 200),
           message:
-            `This line ${what}. An agent that follows it runs code that never appears in the repository.` +
+            `This line ${hit.what}. An agent that follows it runs code that never appears in the repository.` +
             (file.readme ? ' In a README this is often a normal install step; check the URL.' : ''),
           remediation: `Do not let an agent follow ${file.path}:${index + 1} until you have read what it downloads.`,
         });
