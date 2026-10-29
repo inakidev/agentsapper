@@ -10,11 +10,12 @@ First release.
   never runs git or any other process, never opens a symlink and never writes; lint rules and
   tests enforce this.
 - Config files that agents, IDEs or git reach through in-repo symlinks are analyzed as the tool
-  would see them (found by an external review before release).
+  would see them, with link targets resolved as the OS does (found in a second-pass review by a
+  separate Claude session before release).
 - Safe walker with depth, entry, time and file-size limits. Hitting any limit makes the scan
   incomplete and the exit code 2.
 - Text, JSON and SARIF 2.1.0 output; `--format`, `--fail-on`, `--rules` and `--quiet`.
-- Fixture corpus (31 malicious, 8 benign), a container-only exploitability harness on git 2.39
+- Fixture corpus (32 malicious, 8 benign), a container-only exploitability harness on git 2.39
   and 2.56, a differential test of the config parser against git, and a benign-corpus
   evaluation; results in `docs/evaluation/RESULTS.md`.
 - Published from CI with npm provenance.

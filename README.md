@@ -162,11 +162,11 @@ exact names could not be verified verbatim in official docs.
 Full tables: [docs/evaluation/RESULTS.md](docs/evaluation/RESULTS.md). Reproduce them with
 `npm run corpus:fetch && npm run eval`, or with the Evaluation workflow on Linux.
 
-**Fixture corpus.** 31 malicious fixtures (each reproducing a published technique or a known
-evasion, with a link to its source) and 8 benign false-positive traps. All 104 expected findings
+**Fixture corpus.** 32 malicious fixtures (each reproducing a published technique or a known
+evasion, with a link to its source) and 8 benign false-positive traps. All 110 expected findings
 are detected with the expected file, line and severity, with no unexpected findings. These
 fixtures were written alongside the rules, so treat this as a regression suite rather than an
-independent measure; the next two checks are the independent ones.
+independent measure of detection.
 
 **Exploitability on real git.** In throwaway containers with git 2.39.5 (Debian bookworm) and
 git 2.56.0 (Alpine edge, the current release), a harness turns the git fixtures into real
@@ -178,19 +178,25 @@ through `include.path`, a `pre-push` hook from `core.hooksPath`, `git status` in
 bare repository, and `fsmonitor` set through a symlinked `.git/config`. A config-defined hook
 (`hook.<name>.command`) ran on git 2.56.0 only, as expected. Two controls behaved as expected
 on both: `--no-textconv` blocks textconv, and `git status` alone does not run the clean filter.
-agentsapper flagged every case.
+agentsapper flagged every case. This independently confirms that the git fixtures are real
+attacks on current git; it uses the same fixtures, so it says nothing about how detection
+generalizes beyond them.
 
-**Parser parity with git.** 5000 generated configs (fixed seed, legal and illegal syntax) were
-parsed by agentsapper and by `git config --list --file` on both git versions: 3745 that git
-accepts produce the same entries in the same order, and the 1255 git rejects all produce a
-parse error in agentsapper. The first run found one difference (git accepts variables before
-the first section header); it was fixed.
+**Parser parity with git.** This is the check with an independent oracle. 5000 generated
+configs (fixed seed, legal and illegal syntax) were parsed by agentsapper and by
+`git config --list --file` on both git versions: the 3745 that git accepts produce the same
+entries in the same order, and the 1255 git rejects all produce a parse error in agentsapper.
+The first run found one difference (git accepts variables before the first section header);
+it was fixed. Scope: single files only. Include resolution and the gitattributes parser are not
+covered by the differential test.
 
 **Benign corpus.** 16 popular, legitimate repositories (husky, express, axios, eslint, prettier,
 vite, execa, devcontainers/templates, anthropics/claude-code, google-gemini/gemini-cli,
-openai/codex, modelcontextprotocol/servers, cline/cline, requests, flask, pydantic), scanned at
-their default branch on 2026-10-29. Each scan took under 0.3 s. The sample leans on purpose
-towards agent tooling repositories, which is why AGENT and FS findings show up at all.
+openai/codex, modelcontextprotocol/servers, cline/cline, requests, flask, pydantic), each pinned
+to the commit in [scripts/benign-corpus.json](scripts/benign-corpus.json) (their default
+branches on 2026-10-29), so `npm run corpus:fetch` reproduces the exact trees. Each scan took
+under 0.3 s. The sample leans on purpose towards agent tooling repositories, which is why AGENT
+and FS findings show up at all.
 
 - **2 of 16 would fail a CI gate at the default `--fail-on high`.** Both are `SessionStart` hooks
   in `.claude/settings.json` (modelcontextprotocol/servers and cline/cline) that run a project
@@ -198,23 +204,35 @@ towards agent tooling repositories, which is why AGENT and FS findings show up a
   exactly what this tool exists to surface: opening the repository runs its code.
 - The remaining findings are medium or lower and also describe real behavior: dev container
   lifecycle commands (4), Gemini CLI custom commands that run shell (5), symlinks sharing skills
-  between agent config dirs (9), install commands in READMEs (5, low) and routine install
-  scripts (13, info).
+  between agent config dirs (9), downloads in instruction files (6, low: five README install
+  commands and one download piped as data into inline Python) and routine install scripts
+  (13, info).
 - What the evaluation changed: FS-003 was lowered from high to medium because cline/cline
   legitimately shares agent config through in-repo symlinks (links that leave the repo stay at
   high or critical under FS-001 and FS-002, and content reached through in-repo links is still
-  analyzed by the other rules). One false positive was found and fixed: INSTR-003 flagged a
-  download piped as data into inline Python code.
+  analyzed by the other rules). INSTR-003 reported the cline download, which only feeds data to
+  inline Python, at high; it now reports such data pipes at low instead of high, but still
+  reports them, because inline code that executes its input looks the same at a glance.
 
 16 repositories is a small sample chosen by hand; it shows the alert rate on mainstream
 projects, not a false-positive rate for the wider ecosystem.
 
-**External review.** Before release, an independent review found an evasion: a symlinked
-`.claude/settings.json` (or a symlinked `.claude` directory, `CLAUDE.md` or `.git/config`) hid
-its content, so a `SessionStart` hook surfaced only as a medium symlink finding. Agents, IDEs and
-git follow those links, so now does agentsapper: links are resolved as paths and the in-repo
-target is analyzed. The four cases are fixtures, and git following a symlinked `.git/config` is
-confirmed by the exploitability harness.
+**Review before release.** The project was built with Claude Code under the maintainer's spec
+and review. Before release, a second-pass review by a separate Claude session (the same model
+that wrote the code, so not an independent review) found three problems, all now fixed and
+covered by fixtures:
+
+- A symlinked `.claude/settings.json` (or a symlinked `.claude` directory, `CLAUDE.md` or
+  `.git/config`) hid its content, so a `SessionStart` hook surfaced only as a medium symlink
+  finding. agentsapper still never opens or dereferences a link; when a tool would load config
+  through an in-repo link, it now analyzes the target by its own path. The exploitability
+  harness confirms git follows a symlinked `.git/config`.
+- Link targets were normalized as text, so `.claude -> a/b/../conf` with `a/b` itself a link was
+  analyzed at a different place than the one the kernel resolves. Links are now resolved
+  component by component as the OS does (POSIX applies `..` after following a link; Win32
+  normalizes it first).
+- Downloads piped into `python3 -c "exec(sys.stdin.read())"` looked like data pipes. INSTR-003
+  now reports inline code that executes its input at high.
 
 ## Known limitations
 
@@ -250,7 +268,9 @@ monitoring the agent itself.
 
 **What agentsapper guarantees about itself:** it never executes anything from the scanned
 repository (no `git` or other external process; enforced by a lint rule and a test), never
-follows symlinks, never writes to the repository, caps file size, depth, entry count and time,
+opens or dereferences a symlink (link targets are resolved as paths, and only regular files the
+walker saw inside the repo are read), never writes to the repository (also enforced by a lint
+rule and a test), caps file size, depth, entry count and time,
 treats any limit hit as an incomplete scan, escapes control and bidi characters from the repo
 before printing, and has no runtime dependencies.
 
