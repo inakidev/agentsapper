@@ -1,6 +1,6 @@
 name: Release
 
-# Publishes to npm when a vX.Y.Z tag is pushed, with npm provenance, so users can
+# Stages a publish to npm when a vX.Y.Z tag is pushed, with npm provenance, so users can
 # verify the package was built from this repository by this workflow.
 #
 # Requirements: the repository must be public (npm provenance needs a public
@@ -49,6 +49,12 @@ jobs:
       - run: npm run build
       - run: npm run selfscan
       - run: npm pack --dry-run
-      - run: npm publish --provenance --access public
+      # Staged publishing (npm 11.15+): the version waits on npmjs.com, under Staged
+      # Packages, until a maintainer approves it with 2FA. Installed from outside the
+      # checkout, so its .npmrc plays no part.
+      - name: Update npm
+        working-directory: ${{ runner.temp }}
+        run: npm install --global --ignore-scripts npm@11
+      - run: npm stage publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

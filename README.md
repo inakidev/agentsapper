@@ -357,9 +357,10 @@ exploitability harness runs git against them on purpose, so it only runs inside 
 container of the Exploitability workflow. Dependency install scripts are disabled for this
 repository (`.npmrc`).
 
-Releases are published only by the Release workflow, from a `vX.Y.Z` tag that matches
-`package.json`, after every check passes, with npm provenance. Nothing is published from a
-workstation.
+Releases are staged only by the Release workflow, from a `vX.Y.Z` tag on `main` that matches
+`package.json`, after every check passes, with npm provenance. A staged version goes public only
+when the maintainer approves it on npmjs.com with two-factor authentication. Nothing is published
+from a workstation.
 
 ## References
 
