@@ -2,7 +2,8 @@ import { configKey, parseGitBool } from '../../parsers/gitconfig.js';
 import type { Severity } from '../../severity.js';
 import type { Finding, Rule } from '../../types.js';
 import { evidenceOf, liveBool, liveEntries, repoConfig, type SourcedEntry } from './config.js';
-import { clip, REFS } from './references.js';
+import { clip } from '../util.js';
+import { REFS } from './references.js';
 import { findRepos } from './repos.js';
 
 // Keys whose value git executes, checked against git-config(1) for git 2.56.

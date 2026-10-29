@@ -1,7 +1,8 @@
 import type { Finding, Rule } from '../../types.js';
 import { repoConfig } from './config.js';
 import { attributeFiles, driverCommands, driverUses } from './drivers.js';
-import { clip, REFS } from './references.js';
+import { clip } from '../util.js';
+import { REFS } from './references.js';
 import { findRepos } from './repos.js';
 
 // Driver commands that run while just looking at changes. GitLab's ConfigPoisoning

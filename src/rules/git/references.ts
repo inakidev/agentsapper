@@ -9,8 +9,3 @@ export const REFS = {
   githooks: 'https://git-scm.com/docs/githooks',
   gitRepositoryLayout: 'https://git-scm.com/docs/gitrepository-layout',
 } as const;
-
-/** Keeps evidence short; payloads can be long and the line number points to the rest. */
-export function clip(text: string, max = 200): string {
-  return text.length <= max ? text : `${text.slice(0, max - 3)}...`;
-}

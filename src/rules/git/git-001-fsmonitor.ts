@@ -1,7 +1,8 @@
 import { configKey, parseGitBool } from '../../parsers/gitconfig.js';
 import type { Rule } from '../../types.js';
 import { evidenceOf, liveEntries, repoConfig } from './config.js';
-import { clip, REFS } from './references.js';
+import { clip } from '../util.js';
+import { REFS } from './references.js';
 import { findRepos } from './repos.js';
 
 export const GIT_001: Rule = {

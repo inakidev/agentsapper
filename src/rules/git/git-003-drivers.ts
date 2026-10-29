@@ -1,7 +1,8 @@
 import type { Rule } from '../../types.js';
 import { evidenceOf, repoConfig } from './config.js';
 import { driverCommands } from './drivers.js';
-import { clip, REFS } from './references.js';
+import { clip } from '../util.js';
+import { REFS } from './references.js';
 import { findRepos } from './repos.js';
 
 const WHEN: Readonly<Record<string, string>> = {

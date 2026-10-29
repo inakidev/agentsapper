@@ -2,7 +2,8 @@ import { configKey } from '../../parsers/gitconfig.js';
 import { describePlace, locate } from '../../paths.js';
 import type { Finding, Rule } from '../../types.js';
 import { evidenceOf, liveEntries, repoConfig } from './config.js';
-import { clip, REFS } from './references.js';
+import { clip } from '../util.js';
+import { REFS } from './references.js';
 import { findRepos } from './repos.js';
 
 export const GIT_007: Rule = {

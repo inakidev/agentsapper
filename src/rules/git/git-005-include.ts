@@ -2,7 +2,8 @@ import { describePlace } from '../../paths.js';
 import type { Severity } from '../../severity.js';
 import type { Rule } from '../../types.js';
 import { repoConfig } from './config.js';
-import { clip, REFS } from './references.js';
+import { clip } from '../util.js';
+import { REFS } from './references.js';
 import { findRepos } from './repos.js';
 
 export const GIT_005: Rule = {
