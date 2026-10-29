@@ -1,4 +1,5 @@
 import type { Severity } from './severity.js';
+import type { Entry } from './walker.js';
 
 export type RuleStatus = 'stable' | 'experimental';
 
@@ -6,6 +7,20 @@ export type RuleStatus = 'stable' | 'experimental';
 export interface ScanContext {
   /** Absolute path of the repository being scanned. */
   readonly root: string;
+  /** Every entry the walker saw, sorted by path. Symlinks are listed, never followed. */
+  readonly entries: readonly Entry[];
+  /** Reasons the scan may have missed something. Non-empty means incomplete. */
+  readonly incomplete: readonly string[];
+  entry(path: string): Entry | undefined;
+  /** Direct children of a directory (`''` is the root), sorted by path. */
+  children(path: string): readonly Entry[];
+  /**
+   * Contents of a regular file as UTF-8, or undefined for anything else
+   * (missing, directory, symlink, too large). Never reads through a symlink.
+   */
+  readText(path: string): string | undefined;
+  /** Caches a computation shared by several rules for the lifetime of one scan. */
+  memo<T>(key: string, compute: () => T): T;
 }
 
 export interface Finding {

@@ -1,9 +1,23 @@
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { escapeForTerminal } from '../src/report/sanitize.js';
 import { formatText } from '../src/report/text.js';
-import { scan } from '../src/scan.js';
+import { scan, type ScanResult } from '../src/scan.js';
 import type { Rule } from '../src/types.js';
 import { fakeRule, finding } from './helpers/rules.js';
+import { makeTempDir, removeTempDir } from './helpers/tmp.js';
+
+let emptyDir: string;
+beforeAll(() => {
+  emptyDir = makeTempDir();
+});
+afterAll(() => {
+  removeTempDir(emptyDir);
+});
+
+/** Runs the rules over an empty dir, then labels the result as coming from /repo. */
+function resultOf(options: { rules: Rule[] }, overrides: Partial<ScanResult> = {}): ScanResult {
+  return { ...scan(emptyDir, options), root: '/repo', ...overrides };
+}
 
 describe('escapeForTerminal', () => {
   it('leaves ordinary text alone', () => {
@@ -28,7 +42,7 @@ describe('escapeForTerminal', () => {
 
 describe('formatText', () => {
   it('says so when there are no findings', () => {
-    const output = formatText(scan('/repo', { rules: [] }));
+    const output = formatText(resultOf({ rules: [] }));
 
     expect(output).toContain('Scanned /repo with 0 rules.');
     expect(output).toContain('No findings.');
@@ -36,7 +50,7 @@ describe('formatText', () => {
 
   it('groups findings by severity, most severe first', () => {
     const output = formatText(
-      scan('/repo', {
+      resultOf({
         rules: [
           fakeRule('TEST-001', [finding({ severity: 'medium', file: 'm.txt' })]),
           fakeRule('TEST-002', [finding({ severity: 'critical', file: '.git/config', line: 3 })]),
@@ -55,7 +69,7 @@ describe('formatText', () => {
 
   it('shows evidence, explanation and remediation for each finding', () => {
     const output = formatText(
-      scan('/repo', {
+      resultOf({
         rules: [
           fakeRule('TEST-001', [
             finding({ evidence: 'the snippet', message: 'the reason', remediation: 'the fix' }),
@@ -71,7 +85,7 @@ describe('formatText', () => {
 
   it('never prints raw control characters taken from the scanned repo', () => {
     const output = formatText(
-      scan('/repo', {
+      resultOf({
         rules: [
           fakeRule('TEST-001', [
             finding({ file: 'evil\u001b]0;title\u0007.md', evidence: 'line1\nline2\u{202e}' }),
@@ -86,6 +100,17 @@ describe('formatText', () => {
     expect(output).toContain('line1\\u{a}line2\\u{202e}');
   });
 
+  it('warns when the scan is incomplete instead of claiming a clean result', () => {
+    const output = formatText(
+      resultOf({ rules: [] }, { incomplete: ['entry limit of 3 reached', 'cannot read a/b'] }),
+    );
+
+    expect(output).toContain('Scan incomplete (2)');
+    expect(output).toContain('  entry limit of 3 reached');
+    expect(output).toContain('No findings in what was scanned.');
+    expect(output).not.toContain('No findings.\n');
+  });
+
   it('lists rules that failed to run', () => {
     const broken: Rule = {
       ...fakeRule('TEST-001'),
@@ -94,7 +119,7 @@ describe('formatText', () => {
       },
     };
 
-    const output = formatText(scan('/repo', { rules: [broken] }));
+    const output = formatText(resultOf({ rules: [broken] }));
 
     expect(output).toContain('Rule errors (1)');
     expect(output).toContain('TEST-001  bad input');

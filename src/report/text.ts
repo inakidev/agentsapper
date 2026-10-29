@@ -14,7 +14,8 @@ export function formatText(result: ScanResult): string {
   ];
 
   if (result.findings.length === 0) {
-    lines.push('No findings.');
+    lines.push(result.incomplete.length > 0 ? 'No findings in what was scanned.' : 'No findings.');
+    lines.push('');
   }
 
   for (const severity of MOST_SEVERE_FIRST) {
@@ -25,6 +26,14 @@ export function formatText(result: ScanResult): string {
     for (const finding of group) {
       lines.push(...formatFinding(finding, titles.get(finding.ruleId)), '');
     }
+  }
+
+  if (result.incomplete.length > 0) {
+    lines.push(`Scan incomplete (${result.incomplete.length}): findings may be missing.`);
+    for (const reason of result.incomplete) {
+      lines.push(`  ${esc(reason)}`);
+    }
+    lines.push('');
   }
 
   if (result.errors.length > 0) {

@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { EXIT_CLEAN, EXIT_ERROR, EXIT_FINDINGS, runCli, type CliOptions } from '../src/cli.js';
 import type { Rule } from '../src/types.js';
+import { DEFAULT_LIMITS } from '../src/walker.js';
 import { fakeRule, finding } from './helpers/rules.js';
 import { makeTempDir, removeTempDir } from './helpers/tmp.js';
 
@@ -114,6 +115,19 @@ describe('cli', () => {
 
     expect(code).toBe(EXIT_CLEAN);
     expect(stdout).toContain('== MEDIUM (1) ==');
+  });
+
+  it('exits 2 when the scan is incomplete, even without findings', () => {
+    writeFileSync(join(tmp, 'a'), 'a');
+    writeFileSync(join(tmp, 'b'), 'b');
+
+    const { code, stdout } = run([tmp], {
+      rules: [],
+      limits: { ...DEFAULT_LIMITS, maxEntries: 1 },
+    });
+
+    expect(code).toBe(EXIT_ERROR);
+    expect(stdout).toContain('Scan incomplete (1)');
   });
 
   it('exits 2 when a rule fails, even if others found something', () => {

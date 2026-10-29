@@ -7,6 +7,7 @@ import { scan } from './scan.js';
 import { meetsThreshold, type Severity } from './severity.js';
 import type { Rule } from './types.js';
 import { readVersion } from './version.js';
+import type { Limits } from './walker.js';
 
 export const EXIT_CLEAN = 0;
 export const EXIT_FINDINGS = 1;
@@ -27,7 +28,7 @@ Options:
 Exit codes:
   0  no findings at or above ${DEFAULT_FAIL_ON}
   1  findings at or above ${DEFAULT_FAIL_ON}
-  2  usage or runtime error
+  2  usage or runtime error, or the scan was incomplete (limits hit)
 `;
 
 export interface CliIO {
@@ -38,6 +39,8 @@ export interface CliIO {
 export interface CliOptions {
   /** Overrides the built-in rule set (used by tests). */
   readonly rules?: readonly Rule[];
+  /** Overrides the walk and read limits (used by tests). */
+  readonly limits?: Limits;
 }
 
 export function runCli(argv: readonly string[], io: CliIO, options: CliOptions = {}): number {
@@ -96,10 +99,14 @@ function main(argv: readonly string[], io: CliIO, options: CliOptions): number {
     return fail(io, `${root} is not a directory`);
   }
 
-  const result = scan(root, options.rules === undefined ? {} : { rules: options.rules });
+  const result = scan(root, {
+    ...(options.rules === undefined ? {} : { rules: options.rules }),
+    ...(options.limits === undefined ? {} : { limits: options.limits }),
+  });
   io.stdout(formatText(result));
 
-  if (result.errors.length > 0) return EXIT_ERROR;
+  // An incomplete scan must never pass as clean: a repo could pad itself to hide.
+  if (result.errors.length > 0 || result.incomplete.length > 0) return EXIT_ERROR;
   return result.findings.some((f) => meetsThreshold(f.severity, DEFAULT_FAIL_ON))
     ? EXIT_FINDINGS
     : EXIT_CLEAN;
