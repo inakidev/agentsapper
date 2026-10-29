@@ -48,6 +48,22 @@ describe('formatText', () => {
     expect(output).toContain('No findings.');
   });
 
+  it('ends with a verdict that agrees with the exit code', () => {
+    const rules = (severity: 'high' | 'low') => [fakeRule('TEST-001', [finding({ severity })])];
+
+    expect(formatText(resultOf({ rules: [] }))).toContain('Verdict: nothing found.');
+    expect(formatText(resultOf({ rules: rules('high') }))).toContain(
+      'Verdict: do not open this folder with an agent, an IDE or git until you have read the finding at high or above.',
+    );
+    expect(formatText(resultOf({ rules: rules('low') }))).toContain(
+      'Verdict: nothing at high or above',
+    );
+    expect(formatText(resultOf({ rules: rules('low') }), 'low')).toContain('at low or above');
+    expect(formatText(resultOf({ rules: [] }, { incomplete: ['time limit'] }))).toContain(
+      'Verdict: the scan is incomplete',
+    );
+  });
+
   it('groups findings by severity, most severe first', () => {
     const output = formatText(
       resultOf({

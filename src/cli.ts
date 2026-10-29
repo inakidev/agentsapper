@@ -27,6 +27,7 @@ const USAGE = `Usage: agentsapper <path> [options]
 
 Scans a repository for things it can execute or inject before an AI coding
 agent opens it. Read-only: nothing in the repository is run or modified.
+Run it from outside the folder you are checking.
 
 Options:
   --format <text|json|sarif>   Output format (default: text)
@@ -129,8 +130,10 @@ function main(argv: readonly string[], io: CliIO, options: CliOptions): number {
     quiet = parsed.values.quiet;
 
     const [first, ...extra] = parsed.positionals;
+    // No default to the current directory: running from inside an untrusted folder lets
+    // it pick what runs (npx reads its .npmrc, cmd.exe searches it for programs first).
     if (first === undefined || extra.length > 0)
-      throw new UsageError('expected exactly one path to scan');
+      throw new UsageError('expected exactly one path to scan, from outside that folder');
     target = first;
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -168,14 +171,14 @@ function main(argv: readonly string[], io: CliIO, options: CliOptions): number {
 function render(result: ScanResult, format: Format, failOn: Severity, quiet: boolean): string {
   if (format === 'json') return formatJson(result, readVersion());
   if (format === 'sarif') return formatSarif(result, readVersion());
-  if (!quiet) return formatText(result);
+  if (!quiet) return formatText(result, failOn);
   const shown = {
     ...result,
     findings: result.findings.filter((f) => meetsThreshold(f.severity, failOn)),
   };
   const clean =
     shown.findings.length === 0 && result.errors.length === 0 && result.incomplete.length === 0;
-  return clean ? '' : formatText(shown);
+  return clean ? '' : formatText(shown, failOn);
 }
 
 function fail(io: CliIO, message: string): number {
