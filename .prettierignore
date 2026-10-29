@@ -1,0 +1,5 @@
+dist/
+coverage/
+package-lock.json
+# Maintainer-authored spec; keep its formatting as written.
+docs/PROJECT_BRIEF.md
