@@ -1,85 +1,101 @@
 {
-  "description": "Popular, legitimate repositories used to measure false positives. They use the features agentsapper inspects (git hooks, prepare scripts, dev containers, agent config) for legitimate reasons.",
+  "description": "Popular, legitimate repositories used to measure false positives. They use the features agentsapper inspects (git hooks, prepare scripts, dev containers, agent config) for legitimate reasons. Each repository is pinned to the commit evaluated in docs/evaluation/RESULTS.md; run the fetcher with --latest to evaluate current default branches instead.",
   "repos": [
     {
       "name": "husky",
       "url": "https://github.com/typicode/husky",
-      "why": "git hooks manager; prepare script"
+      "why": "git hooks manager; prepare script",
+      "commit": "3f0023dc10d7003d70f2e31aa56300eab80e76d6"
     },
     {
       "name": "express",
       "url": "https://github.com/expressjs/express",
-      "why": "classic Node project"
+      "why": "classic Node project",
+      "commit": "1c6f1b0fe4000977b9a7b4f34097e4d527dd9824"
     },
     {
       "name": "axios",
       "url": "https://github.com/axios/axios",
-      "why": "husky hooks, lifecycle scripts"
+      "why": "husky hooks, lifecycle scripts",
+      "commit": "9d11464a75ee5c644c0308d742f58755c0482594"
     },
     {
       "name": "eslint",
       "url": "https://github.com/eslint/eslint",
-      "why": "large Node project with tooling config"
+      "why": "large Node project with tooling config",
+      "commit": "97431f86d5dc7cd60ade6415393b906cf08fe46c"
     },
     {
       "name": "prettier",
       "url": "https://github.com/prettier/prettier",
-      "why": "VS Code config, lifecycle scripts"
+      "why": "VS Code config, lifecycle scripts",
+      "commit": "c7a823c43bd050b6d7855d50814517d0e65b23af"
     },
     {
       "name": "vite",
       "url": "https://github.com/vitejs/vite",
-      "why": "pnpm monorepo, VS Code config"
+      "why": "pnpm monorepo, VS Code config",
+      "commit": "cce559ab158cc6b177d0911a0bea73436b48faff"
     },
     {
       "name": "execa",
       "url": "https://github.com/sindresorhus/execa",
-      "why": "small Node library"
+      "why": "small Node library",
+      "commit": "247faa0ff0641020e8790475989cee72df85d62b"
     },
     {
       "name": "devcontainer-templates",
       "url": "https://github.com/devcontainers/templates",
-      "why": "many devcontainer.json files with lifecycle commands"
+      "why": "many devcontainer.json files with lifecycle commands",
+      "commit": "4e753eab1195ea28a325fde4bee60bd9fadc9d3e"
     },
     {
       "name": "claude-code",
       "url": "https://github.com/anthropics/claude-code",
-      "why": "dev container and Claude Code project config"
+      "why": "dev container and Claude Code project config",
+      "commit": "58d6da1e34d6cd1c6379dcbf568bd66f5f9b6102"
     },
     {
       "name": "gemini-cli",
       "url": "https://github.com/google-gemini/gemini-cli",
-      "why": "GEMINI.md and .gemini config"
+      "why": "GEMINI.md and .gemini config",
+      "commit": "4a8383b9db43aed3f1a1acef0b5114d810722195"
     },
     {
       "name": "codex",
       "url": "https://github.com/openai/codex",
-      "why": "AGENTS.md and agent tooling"
+      "why": "AGENTS.md and agent tooling",
+      "commit": "297f5e33a5f917863a7b83f262c9ef1431bc0267"
     },
     {
       "name": "mcp-servers",
       "url": "https://github.com/modelcontextprotocol/servers",
-      "why": "MCP servers, npx-based configs in docs"
+      "why": "MCP servers, npx-based configs in docs",
+      "commit": "194cc86e3ae6400958555bd4116849d822d69263"
     },
     {
       "name": "cline",
       "url": "https://github.com/cline/cline",
-      "why": "agent rules files, VS Code extension config"
+      "why": "agent rules files, VS Code extension config",
+      "commit": "b194fe9faf15cf1d73e1506b2c9c783aa307d9c6"
     },
     {
       "name": "requests",
       "url": "https://github.com/psf/requests",
-      "why": "classic Python project"
+      "why": "classic Python project",
+      "commit": "3c7baaa05ab4aa49cc819ce3a819d260de19c157"
     },
     {
       "name": "flask",
       "url": "https://github.com/pallets/flask",
-      "why": "Python project with dev tooling"
+      "why": "Python project with dev tooling",
+      "commit": "d086db856be187255b8ec61ef409357393020f32"
     },
     {
       "name": "pydantic",
       "url": "https://github.com/pydantic/pydantic",
-      "why": "Python project with pre-commit and CI config"
+      "why": "Python project with pre-commit and CI config",
+      "commit": "dd0c36a4be235522e34659ba372c59b43b55f33e"
     }
   ]
 }
