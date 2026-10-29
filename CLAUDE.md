@@ -64,6 +64,7 @@ Config file paths and formats for AI agents (Claude Code, Cursor, Codex, Gemini 
 
 ## Workflow
 
+- **Minimum tokens, maximum results.** Read only what the task needs (targeted searches over whole files), do not repeat checks already done, keep replies short, and produce no extra documents or bundles unless asked.
 - Work **one phase at a time** (F0–F6 in the brief). At the end of each phase, summarize what was done, what is pending, and any decisions taken, then **stop and wait for confirmation**.
 - TDD: write the fixture spec and the failing test first, then the rule.
 - Small, focused commits using Conventional Commits (`feat(git): add GIT-001 fsmonitor rule`).
