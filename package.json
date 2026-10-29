@@ -1,6 +1,6 @@
 {
   "name": "agentsapper",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Read-only scanner that flags what an untrusted repository can execute or inject before an AI coding agent opens it.",
   "keywords": [
     "security",
