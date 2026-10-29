@@ -37,6 +37,11 @@ function evaluateFixtures() {
   const fixtures: Record<string, unknown>[] = [];
   let skipped = 0;
   for (const spec of ALL_SPECS) {
+    if (spec.onlyOn !== undefined && !spec.onlyOn.includes(process.platform)) {
+      skipped++;
+      fixtures.push({ id: spec.id, kind: spec.kind, skipped: `only on ${spec.onlyOn.join('/')}` });
+      continue;
+    }
     let fixture;
     try {
       fixture = materialize(spec);
@@ -137,7 +142,7 @@ function markdown(
     '',
     `${ALL_SPECS.filter((s) => s.kind === 'malicious').length} malicious and ${ALL_SPECS.filter((s) => s.kind === 'benign').length} benign fixtures, each reproducing a published technique or a false-positive trap.` +
       (fixtures.skipped > 0
-        ? ` ${fixtures.skipped} fixture(s) skipped on this machine (symlinks not supported).`
+        ? ` ${fixtures.skipped} fixture(s) skipped on this platform (symlinks not supported, or platform-specific semantics).`
         : ''),
     'A detection counts when the rule reports the expected file (and line, where one is expected).',
     '',

@@ -47,4 +47,6 @@ export interface FixtureSpec {
   readonly outside?: readonly FixtureEntry[];
   /** The exact set of findings a full scan must produce. */
   readonly expect: readonly ExpectedFinding[];
+  /** Platforms whose filesystem semantics the fixture depends on; skipped elsewhere. */
+  readonly onlyOn?: readonly NodeJS.Platform[];
 }

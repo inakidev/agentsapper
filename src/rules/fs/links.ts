@@ -1,6 +1,5 @@
 import { homedir } from 'node:os';
-import { isAbsolute, join, relative, resolve } from 'node:path';
-import { absPath, baseName, parentOf, place } from '../../paths.js';
+import { absPath, baseName, parentOf, relInside, resolveLinkTarget } from '../../paths.js';
 import type { Finding, ScanContext } from '../../types.js';
 import type { Entry } from '../../walker.js';
 import { clip } from '../util.js';
@@ -51,9 +50,6 @@ export interface LinkInfo {
   /** Inside an agent or IDE config dir, or standing in for an instruction file. */
   readonly inAgentConfig: boolean;
 }
-
-/** Same hop limit as Linux's ELOOP. */
-const MAX_HOPS = 40;
 
 /** Directories agents and IDEs load config, rules, commands or tasks from. */
 export const AGENT_CONFIG_DIRS = new Set([
@@ -148,26 +144,14 @@ export function isSensitive(abs: string): boolean {
   return false;
 }
 
-function linkTargetAbs(ctx: ScanContext, linkPath: string): string | undefined {
-  const raw = ctx.entry(linkPath)?.linkTarget;
-  if (raw === undefined || raw === '') return undefined;
-  const target = raw.startsWith('\\\\?\\') ? raw.slice(4) : raw;
-  return isAbsolute(target) ? resolve(target) : resolve(absPath(ctx, parentOf(linkPath)), target);
-}
-
-function follow(ctx: ScanContext, abs: string, hops: number): LinkClass {
-  if (hops > MAX_HOPS) return { kind: 'loop' };
-  const placed = place(ctx, abs);
+/** Classifies where a link really leads, resolved hop by hop as the OS would (paths.ts). */
+function classify(ctx: ScanContext, linkPath: string, text: string): LinkClass {
+  const abs = resolveLinkTarget(ctx, absPath(ctx, parentOf(linkPath)), text);
+  if (abs === undefined) return { kind: 'loop' };
+  const rel = relInside(ctx, abs);
   // Inside the repo is never "sensitive", even when the repo itself lives under a home dir.
-  if (placed.kind === 'inside') return { kind: 'inside', dest: placed.path };
-  if (placed.kind === 'outside') {
-    return isSensitive(abs) ? { kind: 'sensitive', dest: abs } : { kind: 'outside', dest: abs };
-  }
-
-  const next = linkTargetAbs(ctx, placed.link);
-  if (next === undefined) return { kind: 'loop' };
-  const rest = relative(absPath(ctx, placed.link), abs);
-  return follow(ctx, rest === '' ? next : join(next, rest), hops + 1);
+  if (rel !== undefined) return { kind: 'inside', dest: rel };
+  return isSensitive(abs) ? { kind: 'sensitive', dest: abs } : { kind: 'outside', dest: abs };
 }
 
 function inAgentConfig(path: string): boolean {
@@ -182,13 +166,13 @@ export function classifyLinks(ctx: ScanContext): LinkInfo[] {
     ctx.entries.flatMap((entry) => {
       // A .git symlink is a git dir pointer; GIT-007 reports it with that context.
       if (entry.kind !== 'symlink' || baseName(entry.path) === '.git') return [];
-      const first = linkTargetAbs(ctx, entry.path);
-      if (first === undefined) return [];
+      const text = entry.linkTarget ?? '';
+      if (text === '') return [];
       return [
         {
           entry,
-          target: entry.linkTarget ?? '',
-          cls: follow(ctx, first, 1),
+          target: text,
+          cls: classify(ctx, entry.path, text),
           inAgentConfig: inAgentConfig(entry.path),
         },
       ];

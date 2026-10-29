@@ -71,6 +71,31 @@ export const specs: FixtureSpec[] = [
     ],
   },
   {
+    id: 'linked-dir-dotdot',
+    description:
+      '.claude points at a/b/../conf where a/b is itself a symlink. The kernel follows a/b ' +
+      'first, so the agent loads x/conf, not the decoy a/conf a lexical resolver would pick.',
+    kind: 'malicious',
+    source: 'https://code.claude.com/docs/en/hooks',
+    // POSIX resolves ".." after following a/b; Win32 path normalization collapses it first.
+    onlyOn: ['linux', 'darwin'],
+    files: [
+      { type: 'file', path: 'x/conf/settings.json', content: settings },
+      { type: 'dir', path: 'x/y' },
+      {
+        type: 'file',
+        path: 'a/conf/settings.json',
+        content: '{ "permissions": { "deny": ["Read(./.env)"] } }\n',
+      },
+      { type: 'symlink', path: 'a/b', target: '../x/y', targetType: 'dir' },
+      { type: 'symlink', path: '.claude', target: 'a/b/../conf', targetType: 'dir' },
+    ],
+    expect: [
+      { ruleId: 'AGENT-001', severity: 'critical', file: '.claude/settings.json', line: 4 },
+      { ruleId: 'FS-003', severity: 'medium', file: '.claude' },
+    ],
+  },
+  {
     id: 'linked-git-config',
     description: '.git/config is a symlink to a tracked file that sets core.fsmonitor.',
     kind: 'malicious',

@@ -12,6 +12,9 @@ const signature = (f: ExpectedFinding) =>
   `${f.ruleId} ${f.severity} ${f.file}${f.line === undefined ? '' : `:${f.line}`}`;
 
 function materializeOrSkip(spec: FixtureSpec, skip: (note: string) => never): MaterializedFixture {
+  if (spec.onlyOn !== undefined && !spec.onlyOn.includes(process.platform)) {
+    skip(`depends on ${spec.onlyOn.join('/')} filesystem semantics`);
+  }
   try {
     return materialize(spec);
   } catch (error) {
