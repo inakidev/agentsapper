@@ -183,9 +183,8 @@ rules, commands, agents and skills, Copilot instruction and prompt files, Gemini
 and the root README at lower severity. Paths are compared the way Windows and macOS compare
 them, ignoring case, on every platform: `.Claude/Settings.json` counts as
 `.claude/settings.json`, and `.GIT/CONFIG` as `.git/config`. Every rule lists its sources in its
-`references`
-(shown in the SARIF output). Experimental rules are heuristics or depend on settings whose
-exact names could not be verified verbatim in official docs.
+`references` (shown in the SARIF output). Experimental rules are heuristics or depend on settings
+whose exact names could not be verified verbatim in official docs.
 
 ## Evaluation
 
@@ -198,7 +197,8 @@ evasion, with a link to its source) and 8 benign false-positive traps. Two are W
 jobs; one is POSIX-only, and one Linux-only (two names that differ only in case). On Linux, all
 119 expected findings of the other 37 malicious fixtures are detected with the expected file,
 line and severity, with no unexpected findings. In CI every fixture also runs a second time with
-its paths in upper case, on Linux and Windows, and must produce the same findings. These
+its paths in upper case, on Linux and Windows, and must produce the same findings (except the one
+whose two names would collide). These
 fixtures were written alongside the rules, so treat this as a regression suite rather than an
 independent measure of detection.
 
@@ -280,6 +280,11 @@ covered by fixtures:
 - **Not a sandbox and not a verdict.** A clean report means none of these rules fired, not that
   the repository is safe. Code fetched at run time (packages started with `npx`, scripts
   downloaded by install hooks) is out of reach of static analysis.
+- **Code the project runs when you start it is not analyzed.** Fake job-interview repositories
+  often hide their payload in a build config (`postcss.config`, `tailwind.config`, `next.config`)
+  or a server file that runs on `npm run dev` or `npm start`, or in a dependency. agentsapper
+  reports the VS Code tasks and install scripts those repositories also use, but not that code.
+  Run such projects only in a throwaway VM or container.
 - **gitattributes patterns are not matched against files.** A line that routes files through a
   driver is reported even if no current file matches it. The gitattributes parser is tested
   against git's documented behavior, not differentially against git like the config parser.
@@ -312,7 +317,8 @@ including its `.git` directory when one comes with it; and the things that run f
 merely open or inspect it: git (status, diff, log, hooks), coding agents (hooks, MCP servers,
 settings, instruction files), IDEs (tasks, dev containers) and `npm install`.
 
-**Out of scope:** malicious code you run on purpose (`npm test`, `make`), compromised or
+**Out of scope:** malicious code you run on purpose (`npm start`, `npm run dev`, `npm test`,
+`make`), compromised or
 transitive dependencies, prompt injection through ordinary source code, and sandboxing or
 monitoring the agent itself.
 
