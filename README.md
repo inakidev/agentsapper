@@ -4,7 +4,7 @@ Scan an untrusted repository for what it can execute or inject **before** an AI 
 
 ```text
 $ npx agentsapper ./downloaded-repo
-Scanned /home/dev/downloaded-repo with 22 rules.
+Scanned /home/dev/downloaded-repo with 28 rules.
 
 == CRITICAL (1) ==
 
@@ -31,8 +31,9 @@ Verdict: do not open this folder with an agent, an IDE or git until you have rea
 A _sapper_ is the military engineer who clears mines before the troops advance. agentsapper
 clears the repository before the agent goes in.
 
-> Status: 0.1.1. 22 rules across git, filesystem, agent config, instruction files, IDE and
-> package scripts. Zero runtime dependencies. No LLM.
+> Status: 0.1.1. 28 rules across git, filesystem, agent config, instruction files, IDE and
+> package scripts, plus the loaders fake job-interview repositories hide in project code.
+> Zero runtime dependencies. No LLM.
 
 ## Quick start
 
@@ -45,7 +46,7 @@ npx agentsapper ./downloaded-repo
 It takes well under a second. Read the last line:
 
 - `Verdict: do not open this folder...` (exit code 1): read the findings first.
-- `Verdict: nothing found` (exit code 0): none of the 22 rules fired. That is not a guarantee;
+- `Verdict: nothing found` (exit code 0): none of the 28 rules fired. That is not a guarantee;
   see [Known limitations](#known-limitations).
 
 Always run it from **outside** the folder you are checking. Inside it, npx reads the folder's
@@ -96,12 +97,12 @@ vendor's documentation.
 npx agentsapper <path> [--format text|json|sarif] [--fail-on <severity>] [--rules GIT,FS,...] [--quiet]
 ```
 
-| Option      | Default | Meaning                                                                                          |
-| ----------- | ------- | ------------------------------------------------------------------------------------------------ |
-| `--format`  | `text`  | `text` for people, `json` for scripts, `sarif` for GitHub code scanning                          |
-| `--fail-on` | `high`  | Exit 1 when a finding is at or above this severity (`info`, `low`, `medium`, `high`, `critical`) |
-| `--rules`   | all     | Comma-separated families (`GIT`, `FS`, `AGENT`, `INSTR`, `IDE`, `PKG`) or ids (`GIT-001`)        |
-| `--quiet`   | off     | Text output shows only findings at or above `--fail-on`, and nothing when there are none         |
+| Option      | Default | Meaning                                                                                           |
+| ----------- | ------- | ------------------------------------------------------------------------------------------------- |
+| `--format`  | `text`  | `text` for people, `json` for scripts, `sarif` for GitHub code scanning                           |
+| `--fail-on` | `high`  | Exit 1 when a finding is at or above this severity (`info`, `low`, `medium`, `high`, `critical`)  |
+| `--rules`   | all     | Comma-separated families (`GIT`, `FS`, `AGENT`, `INSTR`, `IDE`, `PKG`, `CODE`) or ids (`GIT-001`) |
+| `--quiet`   | off     | Text output shows only findings at or above `--fail-on`, and nothing when there are none          |
 
 Exit codes: `0` nothing at or above `--fail-on`; `1` findings at or above `--fail-on`; `2` usage
 or runtime error, **or an incomplete scan** (a limit was hit or a file could not be read). An
@@ -166,6 +167,7 @@ apply fully.
 | FS-002    | Symlink resolving to credentials or system paths (`~/.ssh`, `~/.aws`, `/etc`, ...)                                                                                                                                         | critical                                                                                 | stable       |
 | FS-003    | Symlink inside an agent or IDE config location, resolving inside the repo                                                                                                                                                  | medium                                                                                   | stable       |
 | FS-004    | A program at the repository root named like a tool agents run (`git.exe`, `node.cmd`, ...), which Windows runs instead of the real one                                                                                     | critical for git, otherwise high                                                         | stable       |
+| FS-005    | A font, image or dictionary file (.woff2, .png, .dict, ...) whose content is script text                                                                                                                                   | high                                                                                     | stable       |
 | AGENT-001 | Claude Code project settings: hooks, helper commands, broad allow rules, `defaultMode`, dangerous `env`, MCP auto-approval, plugins; hooks in agent and skill frontmatter                                                  | critical to medium                                                                       | stable       |
 | AGENT-002 | MCP servers that launch local commands (`.mcp.json`, `.cursor/mcp.json`, `.vscode/mcp.json`, `.gemini/settings.json`, `.codex/config.toml`)                                                                                | critical or high                                                                         | stable       |
 | AGENT-003 | Hooks and setup commands of Cursor, Gemini CLI, Codex and GitHub Copilot                                                                                                                                                   | critical to medium                                                                       | stable       |
@@ -175,7 +177,12 @@ apply fully.
 | INSTR-003 | Instructions to download and run code, or long encoded payloads                                                                                                                                                            | high when the download runs as code, low when it is piped in as data (README: low, info) | experimental |
 | IDE-001   | VS Code tasks with `runOn: folderOpen`                                                                                                                                                                                     | critical with automatic tasks on, otherwise high                                         | stable       |
 | IDE-002   | Dev container lifecycle commands                                                                                                                                                                                           | high for `initializeCommand` (runs on the host), otherwise medium                        | stable       |
+| IDE-003   | A VS Code task or launch config that runs a font, image or text file with node, python or a shell                                                                                                                          | critical on folder open, otherwise high                                                  | stable       |
 | PKG-001   | `package.json` install lifecycle scripts                                                                                                                                                                                   | high when they download, evaluate or decode code, otherwise info                         | stable       |
+| CODE-001  | A build or lint config (postcss, tailwind, next, vite, eslint, ...) hiding code past a long run of blanks, decoding or building code, or reading from a blockchain node                                                    | critical with two signs, otherwise high                                                  | experimental |
+| CODE-002  | A source file that builds a function with access to require from a string, or evaluates code next to network requests                                                                                                      | high or medium                                                                           | experimental |
+| CODE-003  | A value in a .env file that decodes from base64 to a URL                                                                                                                                                                   | high for JSON and paste stores, otherwise medium                                         | experimental |
+| CODE-004  | Literal markers of repository malware campaigns, and their history-rewriting batch file                                                                                                                                    | critical                                                                                 | stable       |
 
 Instruction files are `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `AGENTS.override.md`,
 `GEMINI.md`, `.cursorrules`, `.windsurfrules`, `.clinerules`, `.cursor/rules/*.mdc`, Claude Code
@@ -280,11 +287,13 @@ covered by fixtures:
 - **Not a sandbox and not a verdict.** A clean report means none of these rules fired, not that
   the repository is safe. Code fetched at run time (packages started with `npx`, scripts
   downloaded by install hooks) is out of reach of static analysis.
-- **Code the project runs when you start it is not analyzed.** Fake job-interview repositories
-  often hide their payload in a build config (`postcss.config`, `tailwind.config`, `next.config`)
-  or a server file that runs on `npm run dev` or `npm start`, or in a dependency. agentsapper
-  reports the VS Code tasks and install scripts those repositories also use, but not that code.
-  Run such projects only in a throwaway VM or container.
+- **Code the project runs when you start it is checked for known loader shapes, not
+  understood.** The CODE rules and FS-005 look for how fake job-interview repositories hide
+  their payload in code that runs on `npm run dev` or `npm start`: padded build configs,
+  functions built around `require`, URLs hidden in `.env`, scripts disguised as fonts, campaign
+  markers. A loader written another way gets past them, and dependencies are not analyzed. They
+  skip `node_modules`, build output, minified files, tests, fixtures and examples, and source
+  files over 1 MiB. Run unknown projects only in a throwaway VM or container.
 - **gitattributes patterns are not matched against files.** A line that routes files through a
   driver is reported even if no current file matches it. The gitattributes parser is tested
   against git's documented behavior, not differentially against git like the config parser.
@@ -315,9 +324,11 @@ covered by fixtures:
 **In scope:** a directory you did not write, delivered by clone, archive, synced folder or copy,
 including its `.git` directory when one comes with it; and the things that run from it when you
 merely open or inspect it: git (status, diff, log, hooks), coding agents (hooks, MCP servers,
-settings, instruction files), IDEs (tasks, dev containers) and `npm install`.
+settings, instruction files), IDEs (tasks, dev containers) and `npm install`; and, from 0.2,
+the loader shapes of fake job-interview repositories in code that `npm start` or `npm run dev`
+runs (CODE rules).
 
-**Out of scope:** malicious code you run on purpose (`npm start`, `npm run dev`, `npm test`,
+**Out of scope:** proving that code you run on purpose is safe (`npm start`, `npm test`,
 `make`), compromised or
 transitive dependencies, prompt injection through ordinary source code, and sandboxing or
 monitoring the agent itself.

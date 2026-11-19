@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.2.0
+
+Covers the payloads fake job-interview repositories hide in code that runs on npm start or npm run dev.
+
+- FS-005: scripts disguised as fonts, images or dictionary files (checked by their first bytes).
+- IDE-003: VS Code tasks and launch configs that run such a file with node, python or a shell.
+- CODE-001: build and lint configs hiding code past long runs of blanks, decoding or building
+  code, or reading from a blockchain node.
+- CODE-002: functions built around require from a string, and eval next to network requests.
+- CODE-003: .env values that decode from base64 to a URL, high for JSON and paste stores.
+- CODE-004: literal markers of known repository malware campaigns.
+- A held-out benign corpus, never used to tune rules, is evaluated alongside the calibration corpus.
+
 ## 0.1.1
 
 - IDE-001 now reads the per-OS `windows`, `osx` and `linux` commands of a task, which the
