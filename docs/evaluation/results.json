@@ -1,5 +1,5 @@
 {
-  "rules": 22,
+  "rules": 28,
   "fixtures": {
     "perRule": {
       "GIT-001": {
@@ -74,6 +74,12 @@
         "exactSeverity": 2,
         "unexpected": 0
       },
+      "FS-005": {
+        "expected": 3,
+        "detected": 3,
+        "exactSeverity": 3,
+        "unexpected": 0
+      },
       "AGENT-001": {
         "expected": 18,
         "detected": 18,
@@ -117,9 +123,9 @@
         "unexpected": 0
       },
       "IDE-001": {
-        "expected": 2,
-        "detected": 2,
-        "exactSeverity": 2,
+        "expected": 4,
+        "detected": 4,
+        "exactSeverity": 4,
         "unexpected": 0
       },
       "IDE-002": {
@@ -128,10 +134,40 @@
         "exactSeverity": 4,
         "unexpected": 0
       },
+      "IDE-003": {
+        "expected": 2,
+        "detected": 2,
+        "exactSeverity": 2,
+        "unexpected": 0
+      },
       "PKG-001": {
         "expected": 4,
         "detected": 4,
         "exactSeverity": 4,
+        "unexpected": 0
+      },
+      "CODE-001": {
+        "expected": 1,
+        "detected": 1,
+        "exactSeverity": 1,
+        "unexpected": 0
+      },
+      "CODE-002": {
+        "expected": 2,
+        "detected": 2,
+        "exactSeverity": 2,
+        "unexpected": 0
+      },
+      "CODE-003": {
+        "expected": 1,
+        "detected": 1,
+        "exactSeverity": 1,
+        "unexpected": 0
+      },
+      "CODE-004": {
+        "expected": 2,
+        "detected": 2,
+        "exactSeverity": 2,
         "unexpected": 0
       }
     },
@@ -427,6 +463,15 @@
         "incomplete": []
       },
       {
+        "id": "ide-001-interview-lure-task",
+        "kind": "malicious",
+        "source": "https://www.trendmicro.com/en_gb/research/26/d/void-dokkaebi-uses-fake-job-interview-lure-to-spread-malware-via-code-repositories.html",
+        "expected": 1,
+        "detected": 1,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
         "id": "ide-002-devcontainer",
         "kind": "malicious",
         "source": "https://containers.dev/implementors/json_reference/",
@@ -542,12 +587,56 @@
         "detected": 1,
         "unexpected": [],
         "incomplete": []
+      },
+      {
+        "id": "code-001-padded-build-config",
+        "kind": "malicious",
+        "source": "https://opensourcemalware.com/blog/polinrider-dprk-compromised-hundreds-of-github-repos",
+        "expected": 1,
+        "detected": 1,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "code-002-003-backend-loader",
+        "kind": "malicious",
+        "source": "https://blog.nviso.eu/2025/11/13/contagious-interview-actors-now-utilize-json-storage-services-for-malware-delivery/",
+        "expected": 3,
+        "detected": 3,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "code-004-campaign-markers",
+        "kind": "malicious",
+        "source": "https://www.trendmicro.com/en_gb/research/26/d/void-dokkaebi-uses-fake-job-interview-lure-to-spread-malware-via-code-repositories.html",
+        "expected": 2,
+        "detected": 2,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "ide-003-fs-005-disguised-scripts",
+        "kind": "malicious",
+        "source": "https://www.trendmicro.com/en_gb/research/26/d/void-dokkaebi-uses-fake-job-interview-lure-to-spread-malware-via-code-repositories.html",
+        "expected": 6,
+        "detected": 6,
+        "unexpected": [],
+        "incomplete": []
+      },
+      {
+        "id": "benign-interview-shapes",
+        "kind": "benign",
+        "expected": 0,
+        "detected": 0,
+        "unexpected": [],
+        "incomplete": []
       }
     ],
     "skipped": 2
   },
   "benign": {
-    "fetchedAt": "2026-10-29T22:51:47.020Z",
+    "fetchedAt": "2026-11-19T20:23:43.775Z",
     "platform": "linux",
     "repos": [
       {
@@ -556,7 +645,7 @@
         "why": "git hooks manager; prepare script",
         "commit": "3f0023dc10d7003d70f2e31aa56300eab80e76d6",
         "checkout": "complete",
-        "ms": 2,
+        "ms": 5,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -575,7 +664,7 @@
         "why": "classic Node project",
         "commit": "1c6f1b0fe4000977b9a7b4f34097e4d527dd9824",
         "checkout": "complete",
-        "ms": 9,
+        "ms": 14,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -594,7 +683,7 @@
         "why": "husky hooks, lifecycle scripts",
         "commit": "9d11464a75ee5c644c0308d742f58755c0482594",
         "checkout": "complete",
-        "ms": 20,
+        "ms": 34,
         "bySeverity": {
           "info": 2,
           "low": 0,
@@ -632,7 +721,7 @@
         "why": "large Node project with tooling config",
         "commit": "97431f86d5dc7cd60ade6415393b906cf08fe46c",
         "checkout": "complete",
-        "ms": 41,
+        "ms": 94,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -651,7 +740,7 @@
         "why": "VS Code config, lifecycle scripts",
         "commit": "c7a823c43bd050b6d7855d50814517d0e65b23af",
         "checkout": "complete",
-        "ms": 208,
+        "ms": 338,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -670,7 +759,7 @@
         "why": "pnpm monorepo, VS Code config",
         "commit": "cce559ab158cc6b177d0911a0bea73436b48faff",
         "checkout": "complete",
-        "ms": 69,
+        "ms": 133,
         "bySeverity": {
           "info": 2,
           "low": 0,
@@ -702,7 +791,7 @@
         "why": "small Node library",
         "commit": "247faa0ff0641020e8790475989cee72df85d62b",
         "checkout": "complete",
-        "ms": 12,
+        "ms": 26,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -721,7 +810,7 @@
         "why": "many devcontainer.json files with lifecycle commands",
         "commit": "4e753eab1195ea28a325fde4bee60bd9fadc9d3e",
         "checkout": "complete",
-        "ms": 14,
+        "ms": 16,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -747,7 +836,7 @@
         "why": "dev container and Claude Code project config",
         "commit": "58d6da1e34d6cd1c6379dcbf568bd66f5f9b6102",
         "checkout": "complete",
-        "ms": 34,
+        "ms": 63,
         "bySeverity": {
           "info": 0,
           "low": 2,
@@ -785,7 +874,7 @@
         "why": "GEMINI.md and .gemini config",
         "commit": "4a8383b9db43aed3f1a1acef0b5114d810722195",
         "checkout": "complete",
-        "ms": 50,
+        "ms": 192,
         "bySeverity": {
           "info": 3,
           "low": 0,
@@ -853,7 +942,7 @@
         "why": "AGENTS.md and agent tooling",
         "commit": "297f5e33a5f917863a7b83f262c9ef1431bc0267",
         "checkout": "complete",
-        "ms": 111,
+        "ms": 244,
         "bySeverity": {
           "info": 1,
           "low": 3,
@@ -897,7 +986,7 @@
         "why": "MCP servers, npx-based configs in docs",
         "commit": "194cc86e3ae6400958555bd4116849d822d69263",
         "checkout": "complete",
-        "ms": 37,
+        "ms": 36,
         "bySeverity": {
           "info": 4,
           "low": 0,
@@ -947,7 +1036,7 @@
         "why": "agent rules files, VS Code extension config",
         "commit": "b194fe9faf15cf1d73e1506b2c9c783aa307d9c6",
         "checkout": "complete",
-        "ms": 109,
+        "ms": 243,
         "bySeverity": {
           "info": 1,
           "low": 1,
@@ -1039,7 +1128,7 @@
         "why": "classic Python project",
         "commit": "3c7baaa05ab4aa49cc819ce3a819d260de19c157",
         "checkout": "complete",
-        "ms": 3,
+        "ms": 6,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -1058,7 +1147,7 @@
         "why": "Python project with dev tooling",
         "commit": "d086db856be187255b8ec61ef409357393020f32",
         "checkout": "complete",
-        "ms": 4,
+        "ms": 15,
         "bySeverity": {
           "info": 0,
           "low": 0,
@@ -1084,7 +1173,339 @@
         "why": "Python project with pre-commit and CI config",
         "commit": "dd0c36a4be235522e34659ba372c59b43b55f33e",
         "checkout": "complete",
-        "ms": 9,
+        "ms": 22,
+        "bySeverity": {
+          "info": 0,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": []
+      }
+    ]
+  },
+  "holdout": {
+    "fetchedAt": "2026-11-19T20:24:01.588Z",
+    "platform": "linux",
+    "repos": [
+      {
+        "name": "commerce",
+        "url": "https://github.com/vercel/commerce",
+        "why": "Next.js storefront, the stack of many interview take-homes",
+        "commit": "f7521d57d29f0eb3d23c1399cf9bb299d61fcd21",
+        "checkout": "complete",
+        "ms": 6,
+        "bySeverity": {
+          "info": 0,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": []
+      },
+      {
+        "name": "taxonomy",
+        "url": "https://github.com/shadcn-ui/taxonomy",
+        "why": "Next.js app with Tailwind and PostCSS configs",
+        "commit": "298a8857c7128a0d121e7f699dfd729f23b3966d",
+        "checkout": "complete",
+        "ms": 12,
+        "bySeverity": {
+          "info": 1,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": [
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "package.json:16",
+            "evidence": "scripts.postinstall: prisma generate"
+          }
+        ]
+      },
+      {
+        "name": "create-t3-app",
+        "url": "https://github.com/t3-oss/create-t3-app",
+        "why": "Next.js scaffolder; many config files",
+        "commit": "4709861f7e67a15564c0460c13e7b4b6cfcae40d",
+        "checkout": "complete",
+        "ms": 22,
+        "bySeverity": {
+          "info": 0,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": []
+      },
+      {
+        "name": "indie-stack",
+        "url": "https://github.com/remix-run/indie-stack",
+        "why": "Remix starter with server code",
+        "commit": "56abb93bf81f635b574d9ca23eed05602699458a",
+        "checkout": "complete",
+        "ms": 5,
+        "bySeverity": {
+          "info": 0,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": []
+      },
+      {
+        "name": "express-realworld",
+        "url": "https://github.com/gothinkster/node-express-realworld-example-app",
+        "why": "Express backend with .env usage",
+        "commit": "30b68e1e881462b2f4164ea09ab4c4f5699c7b0b",
+        "checkout": "complete",
+        "ms": 4,
+        "bySeverity": {
+          "info": 0,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": []
+      },
+      {
+        "name": "nest-starter",
+        "url": "https://github.com/nestjs/typescript-starter",
+        "why": "Nest backend starter",
+        "commit": "a191537e0c93c3912189797499239e5ad8519f8c",
+        "checkout": "complete",
+        "ms": 3,
+        "bySeverity": {
+          "info": 0,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": []
+      },
+      {
+        "name": "vite-plugin-react",
+        "url": "https://github.com/vitejs/vite-plugin-react",
+        "why": "Vite configs and playgrounds",
+        "commit": "2c6e0345c4ce87b6297c53333344eede7285d213",
+        "checkout": "complete",
+        "ms": 70,
+        "bySeverity": {
+          "info": 2,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": [
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "package.json:15",
+            "evidence": "scripts.preinstall: npx only-allow pnpm"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "package.json:16",
+            "evidence": "scripts.postinstall: simple-git-hooks"
+          }
+        ]
+      },
+      {
+        "name": "vscode-extension-samples",
+        "url": "https://github.com/microsoft/vscode-extension-samples",
+        "why": "many real .vscode tasks and launch configs",
+        "commit": "65c1c44800eeac6fb065a54823ee5ae62c79540a",
+        "checkout": "complete",
+        "ms": 61,
+        "bySeverity": {
+          "info": 16,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": [
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "chat-context-sample/package.json:35",
+            "evidence": "scripts.postinstall: npx @vscode/dts dev"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "chat-model-provider-sample/package.json:31",
+            "evidence": "scripts.postinstall: npm run download-api"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "chat-output-renderer-sample/package.json:72",
+            "evidence": "scripts.postinstall: npm run download-api"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "inline-completions/package.json:42",
+            "evidence": "scripts.postinstall: npm run download-api"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "lsp-embedded-language-service/package.json:43",
+            "evidence": "scripts.postinstall: cd client && npm install && cd ../server && npm install && cd .."
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "lsp-embedded-request-forwarding/package.json:43",
+            "evidence": "scripts.postinstall: cd client && npm install && cd ../server && npm install && cd .."
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "lsp-log-streaming-sample/package.json:83",
+            "evidence": "scripts.postinstall: cd client && npm install && cd ../server && npm install && cd .."
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "lsp-multi-server-sample/package.json:59",
+            "evidence": "scripts.postinstall: cd client && npm install && cd ../server && npm install && cd .."
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "lsp-sample/package.json:53",
+            "evidence": "scripts.postinstall: cd client && npm install && cd ../server && npm install && cd .."
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "lsp-user-input-sample/package.json:28",
+            "evidence": "scripts.postinstall: cd client && npm install && cd ../server && npm install && cd .."
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "lsp-web-extension-sample/package.json:51",
+            "evidence": "scripts.postinstall: cd client && npm install && cd ../server && npm install && cd .."
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "mcp-extension-sample/package.json:41",
+            "evidence": "scripts.postinstall: npm run download-api"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "proposed-api-sample/package.json:34",
+            "evidence": "scripts.postinstall: npm run download-api"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "telemetry-sample/package.json:36",
+            "evidence": "scripts.postinstall: npm run download-api"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "terminal-sample/package.json:118",
+            "evidence": "scripts.postinstall: npm run download-api"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "wasm-language-server/package.json:50",
+            "evidence": "scripts.postinstall: cd client && npm install && cd .."
+          }
+        ]
+      },
+      {
+        "name": "continue",
+        "url": "https://github.com/continuedev/continue",
+        "why": "AI coding agent with its own config dirs",
+        "commit": "5522c6f44ca0ac3528b37244818fbfa39b5af470",
+        "checkout": "complete",
+        "ms": 146,
+        "bySeverity": {
+          "info": 3,
+          "low": 0,
+          "medium": 0,
+          "high": 0,
+          "critical": 0
+        },
+        "failsAtDefault": false,
+        "incomplete": [],
+        "errors": [],
+        "findings": [
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "extensions/cli/package.json:33",
+            "evidence": "scripts.prepare: npm run build"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "package.json:11",
+            "evidence": "scripts.prepare: husky"
+          },
+          {
+            "ruleId": "PKG-001",
+            "severity": "info",
+            "location": "packages/continue-sdk/typescript/api/package.json:16",
+            "evidence": "scripts.prepare: npm run build"
+          }
+        ]
+      },
+      {
+        "name": "aider",
+        "url": "https://github.com/Aider-AI/aider",
+        "why": "Python AI coding agent",
+        "commit": "5dc9490bb35f9729ef2c95d00a19ccd30c26339c",
+        "checkout": "complete",
+        "ms": 18,
         "bySeverity": {
           "info": 0,
           "low": 0,

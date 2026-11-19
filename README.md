@@ -31,7 +31,7 @@ Verdict: do not open this folder with an agent, an IDE or git until you have rea
 A _sapper_ is the military engineer who clears mines before the troops advance. agentsapper
 clears the repository before the agent goes in.
 
-> Status: 0.1.1. 28 rules across git, filesystem, agent config, instruction files, IDE and
+> Status: 0.2.0. 28 rules across git, filesystem, agent config, instruction files, IDE and
 > package scripts, plus the loaders fake job-interview repositories hide in project code.
 > Zero runtime dependencies. No LLM.
 
@@ -133,7 +133,7 @@ steps:
   - name: Install agentsapper
     # From outside the checkout, so its .npmrc cannot redirect the install.
     working-directory: ${{ runner.temp }}
-    run: npm install --global --ignore-scripts agentsapper@0.1.1
+    run: npm install --global --ignore-scripts agentsapper@0.2.0
   - name: Scan with agentsapper
     run: |
       status=0
@@ -198,11 +198,11 @@ whose exact names could not be verified verbatim in official docs.
 Full tables: [docs/evaluation/RESULTS.md](docs/evaluation/RESULTS.md). Reproduce them with
 `npm run corpus:fetch && npm run eval`, or with the Evaluation workflow on Linux.
 
-**Fixture corpus.** 39 malicious fixtures (each reproducing a published technique or a known
-evasion, with a link to its source) and 8 benign false-positive traps. Two are Windows-only
+**Fixture corpus.** 44 malicious fixtures (each reproducing a published technique or a known
+evasion, with a link to its source) and 9 benign false-positive traps. Two are Windows-only
 (directory junctions, and the Win32 treatment of `..` in link targets) and run in the Windows CI
 jobs; one is POSIX-only, and one Linux-only (two names that differ only in case). On Linux, all
-119 expected findings of the other 37 malicious fixtures are detected with the expected file,
+132 expected findings of the other 42 malicious fixtures are detected with the expected file,
 line and severity, with no unexpected findings. In CI every fixture also runs a second time with
 its paths in upper case, on Linux and Windows, and must produce the same findings (except the one
 whose two names would collide). These
@@ -257,6 +257,13 @@ and FS findings show up at all.
 
 16 repositories is a small sample, picked to exercise the features agentsapper inspects; it
 shows the alert rate on mainstream projects, not a false-positive rate for the wider ecosystem.
+
+**Held-out corpus.** The corpus above was also used to tune two rules, so 10 more repositories
+are kept apart and never used for tuning ([scripts/holdout-corpus.json](scripts/holdout-corpus.json)):
+Next.js, Remix, Express and Nest projects like the ones interview take-homes use, Vite plugins,
+Microsoft's VS Code extension samples (with many real tasks and launch configs) and two AI
+coding agents. **None of the 10 fails at the default threshold**; the only findings are 22
+routine install scripts (info).
 
 **Review before release.** The project was built with Claude Code under the maintainer's spec
 and review. Before release, a second-pass review by a separate Claude session (the same model
