@@ -1,6 +1,14 @@
 # Changelog
 
-## 0.1.0 (unreleased)
+## 0.1.1
+
+- IDE-001 now reads the per-OS `windows`, `osx` and `linux` commands of a task, which the
+  fake job-interview repositories use, so their evidence is no longer empty. A task that
+  downloads code and runs it is critical, and the finding says when its presentation settings
+  hide the terminal.
+- The README states that code run by `npm start` or `npm run dev` is not analyzed.
+
+## 0.1.0
 
 First release.
 

@@ -31,7 +31,7 @@ Verdict: do not open this folder with an agent, an IDE or git until you have rea
 A _sapper_ is the military engineer who clears mines before the troops advance. agentsapper
 clears the repository before the agent goes in.
 
-> Status: 0.1.0. 22 rules across git, filesystem, agent config, instruction files, IDE and
+> Status: 0.1.1. 22 rules across git, filesystem, agent config, instruction files, IDE and
 > package scripts. Zero runtime dependencies. No LLM.
 
 ## Quick start
@@ -132,7 +132,7 @@ steps:
   - name: Install agentsapper
     # From outside the checkout, so its .npmrc cannot redirect the install.
     working-directory: ${{ runner.temp }}
-    run: npm install --global --ignore-scripts agentsapper@0.1.0
+    run: npm install --global --ignore-scripts agentsapper@0.1.1
   - name: Scan with agentsapper
     run: |
       status=0

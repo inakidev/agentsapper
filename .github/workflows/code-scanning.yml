@@ -28,7 +28,7 @@ jobs:
       - name: Install agentsapper
         # From outside the checkout, so its .npmrc cannot redirect the install.
         working-directory: ${{ runner.temp }}
-        run: npm install --global --ignore-scripts agentsapper@0.1.0
+        run: npm install --global --ignore-scripts agentsapper@0.1.1
       - name: Scan with agentsapper
         run: |
           status=0
