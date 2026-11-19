@@ -2,6 +2,7 @@ import type { FixtureSpec } from '../spec.js';
 import { specs as agentConfigs } from './agent-configs.js';
 import { specs as benignGit } from './benign-git.js';
 import { specs as caseSpelling } from './case-spelling.js';
+import { specs as codeInterview } from './code-interview.js';
 import { specs as fsSymlinks } from './fs-symlinks.js';
 import { specs as git001 } from './git-001-fsmonitor.js';
 import { specs as git002 } from './git-002-exec-keys.js';
@@ -29,4 +30,5 @@ export const ALL_SPECS: readonly FixtureSpec[] = [
   ...idePkg,
   ...linkedConfigs,
   ...caseSpelling,
+  ...codeInterview,
 ];

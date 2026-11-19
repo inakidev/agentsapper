@@ -23,7 +23,7 @@ function commandOf(task: Record<string, unknown>): string {
 }
 
 /** The task's commands, including the per-OS ones that override the default. */
-function commandsOf(task: Record<string, unknown>): string[] {
+export function commandsOf(task: Record<string, unknown>): string[] {
   const commands = [commandOf(task)];
   for (const os of ['windows', 'osx', 'linux']) {
     const override = task[os];

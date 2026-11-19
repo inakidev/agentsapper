@@ -26,6 +26,8 @@ export interface ScanContext {
   readText(path: string): string | undefined;
   /** Like `readText` for binary files, with their own size cap. */
   readBytes(path: string, maxBytes: number): Uint8Array | undefined;
+  /** The first `bytes` bytes of a regular file, whatever its size. */
+  readHead(path: string, bytes: number): Uint8Array | undefined;
   /** Caches a computation shared by several rules for the lifetime of one scan. */
   memo<T>(key: string, compute: () => T): T;
 }

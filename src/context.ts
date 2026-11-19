@@ -44,6 +44,14 @@ export function createContext(root: string, walked: WalkResult, limits: Limits):
     return bytes;
   };
 
+  const readHead = (path: string, bytes: number): Uint8Array | undefined => {
+    const entry = lookup(path);
+    if (entry?.kind !== 'file') return undefined;
+    const head = readRegularFile(join(root, ...entry.path.split('/')), bytes, true);
+    if (head === undefined) incomplete.push(`cannot read ${entry.path}`);
+    return head;
+  };
+
   const readText = (path: string): string | undefined => {
     const real = lookup(path)?.path ?? path;
     if (texts.has(real)) return texts.get(real);
@@ -61,6 +69,7 @@ export function createContext(root: string, walked: WalkResult, limits: Limits):
     children: (path) => byParent.get(path) ?? byParent.get(lookup(path)?.path ?? path) ?? [],
     readText,
     readBytes,
+    readHead,
     memo: <T>(key: string, compute: () => T): T => {
       if (!memos.has(key)) memos.set(key, compute());
       return memos.get(key) as T;
@@ -68,13 +77,14 @@ export function createContext(root: string, walked: WalkResult, limits: Limits):
   };
 }
 
-function readRegularFile(abs: string, maxBytes: number): Uint8Array | undefined {
+/** The whole file, or with `head` only its first `maxBytes` bytes. */
+function readRegularFile(abs: string, maxBytes: number, head = false): Uint8Array | undefined {
   let fd: number | undefined;
   try {
     fd = openSync(abs, OPEN_FLAGS);
     const stats = fstatSync(fd);
-    if (!stats.isFile() || stats.size > maxBytes) return undefined;
-    const buffer = Buffer.alloc(stats.size);
+    if (!stats.isFile() || (!head && stats.size > maxBytes)) return undefined;
+    const buffer = Buffer.alloc(Math.min(stats.size, maxBytes));
     let offset = 0;
     while (offset < buffer.length) {
       const read = readSync(fd, buffer, offset, buffer.length - offset, offset);

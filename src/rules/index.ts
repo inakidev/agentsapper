@@ -1,7 +1,12 @@
 import type { Rule } from '../types.js';
 import { IDE_001 } from './ide/ide-001-folder-open-task.js';
 import { IDE_002 } from './ide/ide-002-devcontainer.js';
+import { IDE_003 } from './ide/ide-003-disguised-script.js';
 import { PKG_001 } from './pkg/pkg-001-lifecycle-scripts.js';
+import { CODE_001 } from './code/code-001-build-config.js';
+import { CODE_002 } from './code/code-002-dynamic-loader.js';
+import { CODE_003 } from './code/code-003-encoded-url.js';
+import { CODE_004 } from './code/code-004-campaign-marker.js';
 import { AGENT_001 } from './agent/agent-001-claude-code.js';
 import { AGENT_002 } from './agent/agent-002-mcp.js';
 import { AGENT_003 } from './agent/agent-003-other-hooks.js';
@@ -13,6 +18,7 @@ import { FS_001 } from './fs/fs-001-outside.js';
 import { FS_002 } from './fs/fs-002-sensitive.js';
 import { FS_003 } from './fs/fs-003-agent-config.js';
 import { FS_004 } from './fs/fs-004-planted-program.js';
+import { FS_005 } from './fs/fs-005-disguised-file.js';
 import { GIT_001 } from './git/git-001-fsmonitor.js';
 import { GIT_002 } from './git/git-002-exec-keys.js';
 import { GIT_003 } from './git/git-003-drivers.js';
@@ -36,6 +42,7 @@ export const ALL_RULES: readonly Rule[] = [
   FS_002,
   FS_003,
   FS_004,
+  FS_005,
   AGENT_001,
   AGENT_002,
   AGENT_003,
@@ -45,5 +52,10 @@ export const ALL_RULES: readonly Rule[] = [
   INSTR_003,
   IDE_001,
   IDE_002,
+  IDE_003,
   PKG_001,
+  CODE_001,
+  CODE_002,
+  CODE_003,
+  CODE_004,
 ];

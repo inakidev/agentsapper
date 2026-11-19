@@ -21,7 +21,7 @@ export const DEFAULT_FAIL_ON: Severity = 'high';
 
 const FORMATS = ['text', 'json', 'sarif'] as const;
 type Format = (typeof FORMATS)[number];
-const FAMILIES = ['GIT', 'FS', 'AGENT', 'INSTR', 'IDE', 'PKG'];
+const FAMILIES = ['GIT', 'FS', 'AGENT', 'INSTR', 'IDE', 'PKG', 'CODE'];
 
 const USAGE = `Usage: agentsapper <path> [options]
 
