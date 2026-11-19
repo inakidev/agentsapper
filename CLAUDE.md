@@ -38,7 +38,7 @@ src/
   scan.ts             # orchestrates walker + rules
   walker.ts           # safe filesystem walk (lstat, limits)
   parsers/            # gitconfig.ts, gitattributes.ts, jsonc.ts, ...
-  rules/<family>/     # one file per rule: git/, fs/, agent/, instr/, ide/, pkg/
+  rules/<family>/     # one file per rule: git/, fs/, agent/, instr/, ide/, pkg/, code/
   report/             # text.ts, json.ts, sarif.ts
 fixtures/
   specs/              # fixture definitions (data only, never live repos)
@@ -81,6 +81,7 @@ These are set up in F0; keep this list updated if they change.
 - `npm run format` / `npm run format:check`: Prettier
 - `npm run build`: compile to `dist/`
 - `npm run selfscan`: run the built CLI against this repo; must exit 0
-- `npm run corpus:fetch [dir]`: shallow-clone the benign corpus outside the repo (default: OS temp dir)
+- `npm run corpus:fetch [dir]`: shallow-clone the benign corpus outside the repo (default: OS temp dir); add `--holdout` for the held-out corpus, which must never be used to tune rules
 - `npm run eval`: fixture detection plus benign-corpus scan; writes `docs/evaluation/RESULTS.md`
+- `npm run demo`: plant 11 small cases in a temp dir, scan them with the built CLI, print OK or FAIL
 - Exploitability harness (`vitest.exploit.config.ts`): container only, run by the Exploitability workflow; never on the host
