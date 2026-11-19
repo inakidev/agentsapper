@@ -2,6 +2,7 @@ import { isObject, isString } from '../../parsers/jsonc.js';
 import { parentOf } from '../../paths.js';
 import type { Finding, Rule } from '../../types.js';
 import { at, filesMatching, lineOf, readJsonc } from '../agent/common.js';
+import { classifyDownloadPipe } from '../instr/instr-003-remote-exec.js';
 import { clip } from '../util.js';
 
 // https://code.visualstudio.com/docs/debugtest/tasks: runOptions.runOn "folderOpen"
@@ -20,6 +21,29 @@ function commandOf(task: Record<string, unknown>): string {
   const args = Array.isArray(task.args) ? task.args.filter(isString).join(' ') : '';
   return `${head} ${args}`.trim();
 }
+
+/** The task's commands, including the per-OS ones that override the default. */
+function commandsOf(task: Record<string, unknown>): string[] {
+  const commands = [commandOf(task)];
+  for (const os of ['windows', 'osx', 'linux']) {
+    const override = task[os];
+    if (!isObject(override)) continue;
+    const command = commandOf({ args: task.args, ...override });
+    if (command !== '') commands.push(`${os}: ${command}`);
+  }
+  return commands.filter((c) => c !== '');
+}
+
+/** presentation settings that keep the task's terminal out of sight. */
+function hidesOutput(task: Record<string, unknown>): boolean {
+  const p = task.presentation;
+  return isObject(p) && (p.reveal === 'never' || p.echo === false || p.close === true);
+}
+
+const downloadsAndRuns = (command: string) => {
+  const pipe = classifyDownloadPipe(command);
+  return pipe === 'program' || pipe === 'inline-exec';
+};
 
 export const IDE_001: Rule = {
   id: 'IDE-001',
@@ -44,16 +68,24 @@ export const IDE_001: Rule = {
           return [];
         const label = isString(task.label) ? task.label : `#${i}`;
         const line = lineOf(json, 'tasks', i, 'runOptions', 'runOn');
+        const commands = commandsOf(task);
+        const downloads = commands.some(downloadsAndRuns);
+        const hidden = hidesOutput(task);
+        const extra =
+          (downloads ? ' It downloads code and runs it.' : '') +
+          (hidden ? ' Its presentation settings keep the terminal hidden, so it runs unseen.' : '');
         return [
           {
             ruleId: 'IDE-001',
-            severity: automatic ? 'critical' : 'high',
+            severity: automatic || downloads ? 'critical' : 'high',
             file,
             ...(line === undefined ? {} : { line }),
-            evidence: clip(`task "${label}": ${commandOf(task)}`),
-            message: automatic
-              ? 'This task runs as soon as the folder opens, and task.allowAutomaticTasks is "on" in the workspace settings, so VS Code runs it without asking once the workspace is trusted.'
-              : 'This task runs as soon as the folder opens in a trusted workspace. Agents and extensions that open the folder trigger it too.',
+            evidence: clip(`task "${label}": ${commands.join('; ')}`),
+            message:
+              (automatic
+                ? 'This task runs as soon as the folder opens, and task.allowAutomaticTasks is "on" in the workspace settings, so VS Code runs it without asking once the workspace is trusted.'
+                : 'This task runs as soon as the folder opens in a trusted workspace. Agents and extensions that open the folder trigger it too.') +
+              extra,
             remediation: `Remove runOptions.runOn from the "${label}" task in ${file}, or open the folder in Restricted Mode first.`,
           },
         ];
