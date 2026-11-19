@@ -16,11 +16,18 @@ import { join } from 'node:path';
 
 const args = process.argv.slice(2);
 const latest = args.includes('--latest');
-const list = JSON.parse(readFileSync(new URL('./benign-corpus.json', import.meta.url), 'utf8'));
+// --holdout fetches the held-out corpus, which is never used to tune rules.
+const holdout = args.includes('--holdout');
+const list = JSON.parse(
+  readFileSync(
+    new URL(holdout ? './holdout-corpus.json' : './benign-corpus.json', import.meta.url),
+    'utf8',
+  ),
+);
 const dir =
   args.find((a) => !a.startsWith('--')) ??
   process.env.AGENTSAPPER_CORPUS ??
-  join(tmpdir(), 'agentsapper-corpus');
+  join(tmpdir(), holdout ? 'agentsapper-holdout' : 'agentsapper-corpus');
 mkdirSync(dir, { recursive: true });
 
 const git = (gitArgs, cwd) =>

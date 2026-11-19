@@ -1,0 +1,65 @@
+{
+  "about": "Held-out benign corpus: never used to tune rules. Evaluated once per release to measure false positives without the bias of the calibration corpus (scripts/benign-corpus.json).",
+  "repos": [
+    {
+      "name": "commerce",
+      "url": "https://github.com/vercel/commerce",
+      "why": "Next.js storefront, the stack of many interview take-homes",
+      "commit": "f7521d57d29f0eb3d23c1399cf9bb299d61fcd21"
+    },
+    {
+      "name": "taxonomy",
+      "url": "https://github.com/shadcn-ui/taxonomy",
+      "why": "Next.js app with Tailwind and PostCSS configs",
+      "commit": "298a8857c7128a0d121e7f699dfd729f23b3966d"
+    },
+    {
+      "name": "create-t3-app",
+      "url": "https://github.com/t3-oss/create-t3-app",
+      "why": "Next.js scaffolder; many config files",
+      "commit": "4709861f7e67a15564c0460c13e7b4b6cfcae40d"
+    },
+    {
+      "name": "indie-stack",
+      "url": "https://github.com/remix-run/indie-stack",
+      "why": "Remix starter with server code",
+      "commit": "56abb93bf81f635b574d9ca23eed05602699458a"
+    },
+    {
+      "name": "express-realworld",
+      "url": "https://github.com/gothinkster/node-express-realworld-example-app",
+      "why": "Express backend with .env usage",
+      "commit": "30b68e1e881462b2f4164ea09ab4c4f5699c7b0b"
+    },
+    {
+      "name": "nest-starter",
+      "url": "https://github.com/nestjs/typescript-starter",
+      "why": "Nest backend starter",
+      "commit": "a191537e0c93c3912189797499239e5ad8519f8c"
+    },
+    {
+      "name": "vite-plugin-react",
+      "url": "https://github.com/vitejs/vite-plugin-react",
+      "why": "Vite configs and playgrounds",
+      "commit": "2c6e0345c4ce87b6297c53333344eede7285d213"
+    },
+    {
+      "name": "vscode-extension-samples",
+      "url": "https://github.com/microsoft/vscode-extension-samples",
+      "why": "many real .vscode tasks and launch configs",
+      "commit": "65c1c44800eeac6fb065a54823ee5ae62c79540a"
+    },
+    {
+      "name": "continue",
+      "url": "https://github.com/continuedev/continue",
+      "why": "AI coding agent with its own config dirs",
+      "commit": "5522c6f44ca0ac3528b37244818fbfa39b5af470"
+    },
+    {
+      "name": "aider",
+      "url": "https://github.com/Aider-AI/aider",
+      "why": "Python AI coding agent",
+      "commit": "5dc9490bb35f9729ef2c95d00a19ccd30c26339c"
+    }
+  ]
+}

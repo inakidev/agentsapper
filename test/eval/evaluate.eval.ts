@@ -18,6 +18,8 @@ import type { Finding } from '../../src/types.js';
 const repoRoot = fileURLToPath(new URL('../..', import.meta.url));
 const outDir = join(repoRoot, 'docs', 'evaluation');
 const corpusDir = process.env.AGENTSAPPER_CORPUS ?? join(tmpdir(), 'agentsapper-corpus');
+// Never used to tune rules (scripts/holdout-corpus.json); reported separately.
+const holdoutDir = process.env.AGENTSAPPER_HOLDOUT ?? join(tmpdir(), 'agentsapper-holdout');
 const FAIL_ON: Severity = 'high';
 
 interface RuleTally {
@@ -97,8 +99,8 @@ interface ManifestRepo {
   checkout?: string;
 }
 
-function evaluateBenign() {
-  const manifestPath = join(corpusDir, 'manifest.json');
+function evaluateBenign(dir = corpusDir) {
+  const manifestPath = join(dir, 'manifest.json');
   if (!existsSync(manifestPath)) return undefined;
   const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as {
     fetchedAt: string;
@@ -107,7 +109,7 @@ function evaluateBenign() {
   };
   const repos = manifest.repos.map((repo) => {
     const started = Date.now();
-    const result = scan(join(corpusDir, repo.name));
+    const result = scan(join(dir, repo.name));
     const bySeverity = Object.fromEntries(
       SEVERITIES.map((s) => [s, result.findings.filter((f) => f.severity === s).length]),
     );
@@ -132,6 +134,7 @@ function evaluateBenign() {
 function markdown(
   fixtures: ReturnType<typeof evaluateFixtures>,
   benign: ReturnType<typeof evaluateBenign>,
+  holdout: ReturnType<typeof evaluateBenign>,
 ): string {
   const out: string[] = [
     '# Evaluation results',
@@ -293,6 +296,28 @@ function markdown(
         `- **${r.name}**: ${[...r.incomplete, ...r.errors.map((e) => `${e.ruleId}: ${e.message}`)].join('; ')}`,
       );
   }
+
+  if (holdout !== undefined) {
+    const failingHoldout = holdout.repos.filter((r) => r.failsAtDefault);
+    out.push(
+      '',
+      '## Held-out corpus',
+      '',
+      `${holdout.repos.length} more legitimate repositories that were never used to tune the rules ([scripts/holdout-corpus.json](../../scripts/holdout-corpus.json)), so they measure false positives without the bias of the corpus above. **${failingHoldout.length} of ${holdout.repos.length}** would fail at the default \`--fail-on ${FAIL_ON}\`.`,
+      '',
+      '| Repository | Commit | Critical | High | Medium | Low | Info | Fails at high | Findings at medium or above |',
+      '|---|---|---:|---:|---:|---:|---:|:---:|---|',
+    );
+    for (const r of holdout.repos) {
+      const s = r.bySeverity as Record<Severity, number>;
+      const shown = r.findings
+        .filter((f) => meetsThreshold(f.severity, 'medium'))
+        .map((f) => `${f.ruleId} \`${f.location}\``);
+      out.push(
+        `| [${r.name}](${r.url}) | \`${r.commit.slice(0, 7)}\` | ${s.critical} | ${s.high} | ${s.medium} | ${s.low} | ${s.info} | ${r.failsAtDefault ? 'yes' : 'no'} | ${shown.join(', ') || '-'} |`,
+      );
+    }
+  }
   out.push('');
   return out.join('\n');
 }
@@ -300,10 +325,11 @@ function markdown(
 it('evaluates agentsapper against the fixture and benign corpora', () => {
   const fixtures = evaluateFixtures();
   const benign = evaluateBenign();
+  const holdout = evaluateBenign(holdoutDir);
   mkdirSync(outDir, { recursive: true });
   writeFileSync(
     join(outDir, 'results.json'),
-    `${JSON.stringify({ rules: ALL_RULES.length, fixtures, benign }, null, 2)}\n`,
+    `${JSON.stringify({ rules: ALL_RULES.length, fixtures, benign, holdout }, null, 2)}\n`,
   );
-  writeFileSync(join(outDir, 'RESULTS.md'), markdown(fixtures, benign));
+  writeFileSync(join(outDir, 'RESULTS.md'), markdown(fixtures, benign, holdout));
 });
